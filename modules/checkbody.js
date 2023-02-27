@@ -1,3 +1,4 @@
+//Check if body if empty or not
 function checkBody(body, keys) {
   let isValid = true;
 

@@ -12,7 +12,7 @@ const resumeSchema = mongoose.Schema({
   lineup: String,
   birthDate: String,
   englishLevel: Number,
-  spanichLevel: Number,
+  spanishLevel: Number,
   germanLevel: Number,
   skills: [{ type: mongoose.Schema.Types.ObjectId, ref: "skills" }],
 });
