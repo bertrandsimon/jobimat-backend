@@ -21,7 +21,7 @@ router.post("/", (req, res) => {
       });
       // save the new user
       newJob.save().then(() => {
-        res.json({ result: true });
+        res.json({ result: true, reference:newJob.reference});
       });
     } else {
       // user is already registered
@@ -63,7 +63,7 @@ router.delete("/:delete", (req, res) => {
     }).then((data) => {
       if (data.deletedCount>0) {
         console.log(data);
-        res.json({ result: true, data: data });
+        res.json({ result: true, data: data.reference });
       } else {
         res.json({ result: false, error: "job not found" });
       }
