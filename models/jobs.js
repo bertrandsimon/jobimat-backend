@@ -6,12 +6,13 @@ const jobSchema = mongoose.Schema({
   contract: { type: mongoose.Schema.Types.ObjectId, ref: "contract" },
   date: Date,
   reference: String,
-  store: { type: mongoose.Schema.Types.ObjectId, ref: "stores" },
-  job_type: { type: mongoose.Schema.Types.ObjectId, ref: "job_types" },
-  is_top_offer: Boolean,
-  is_validated: Boolean,
-  candidate_found: Boolean,
-  is_displayed: Boolean,
+  store: [{ type: mongoose.Schema.Types.ObjectId, ref: "stores" }],
+  jobType: [{ type: mongoose.Schema.Types.ObjectId, ref: "job_types" }],
+  isTopOffer: Boolean,
+  isValidated: Boolean,
+  candidateFound: Boolean,
+  isDisplayed: Boolean,
+  jobImage: String,
 });
 
 const Job = mongoose.model("jobs", jobSchema);
