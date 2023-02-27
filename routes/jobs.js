@@ -1,22 +1,23 @@
 var express = require('express');
 var router = express.Router();
 const {checkBody}=require ('../modules/checkBody');
-const jobs= require ('../models/jobs');
+const Job= require ('../models/jobs');
 
-// creation jobs
+// creation job advertisement
 router.post('/', (req, res)=> {
-    if ( !checkBody(req.body,["username","password"])){
+    if ( !checkBody(req.body,["title","reference"])){
         res.json({result: false, error:"Missing or empty field"});
         return;
     }
-    // check if user is already registred
-    User.findOne({username:req.body.username})
+    // check if job is already registred
+    Job.findOne({reference:req.body.reference})
     .then (data => {
         if (data === null){
-  // user is not yet registred => creat new user par rapport au UserSchema
-  const newUser = new User({
-      username : req.body.username,
-      password : req.body.password,
+  // jobis not yet registred => creat new job advertisement
+  const newJob = new Job({
+      title : req.body.title,
+      date: new Date,
+      reference : req.body.reference,
   });
   // save the new user
       newUser.save().then(() =>{
@@ -24,13 +25,10 @@ router.post('/', (req, res)=> {
       } );
       } else {
   // user is already registered
-          res.json ({result: false, error: "user already exists"})
+          res.json ({result: false, error: "job advertisement  already exists"})
       }
     });
   });
   
-
-  res.send('respond with a resource');
-});
 
 module.exports = router;
