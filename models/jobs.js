@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const jobSchema = mongoose.Schema({
   title: String,
   description: String,
-  contract: { type: mongoose.Schema.Types.ObjectId, ref: "contract" },
+  contract: { type: mongoose.Schema.Types.ObjectId, ref: "contracts" },
   date: Date,
   reference: String,
   store: { type: mongoose.Schema.Types.ObjectId, ref: "stores" },
