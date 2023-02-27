@@ -4,8 +4,8 @@ const {checkBody}=require ('../modules/checkBody');
 const Job= require ('../models/jobs');
 
 // creation job advertisement
-router.post('/', (req, res)=> {
-    if ( !checkBody(req.body,["title","reference"])){
+router.post('/', (req, res)=> { console.log(req.body);
+    if ( !checkBody(req.body,["title"])){
         res.json({result: false, error:"Missing or empty field"});
         return;
     }
@@ -20,7 +20,7 @@ router.post('/', (req, res)=> {
       reference : req.body.reference,
   });
   // save the new user
-      newUser.save().then(() =>{
+      newJob.save().then(() =>{
           res.json({result: true});
       } );
       } else {
@@ -29,6 +29,8 @@ router.post('/', (req, res)=> {
       }
     });
   });
+
+  
   
 
 module.exports = router;
