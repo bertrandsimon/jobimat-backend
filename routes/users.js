@@ -8,18 +8,20 @@ const Applicant = require("../models/users");
 
 router.post("/signup", (req, res) => {
   console.log(req.body);
-  if (!checkBody(req.body, ["surname", "password"])) {
+  if (!checkBody(req.body, ["email", "password"])) {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
 
   // Check if the user has not already been registered
-  Applicant.findOne({ surname: req.body.surname }).then((data) => {
+  Applicant.findOne({ email: 
+    req.body.email
+     }).then((data) => { 
     if (data === null) {
       const hash = bcrypt.hashSync(req.body.password, 10);
 
       const newApplicant = new Applicant({
-        surname: req.body.surname,
+        email: req.body.email,
         password: hash,
         token: uid2(32),
       });
@@ -51,5 +53,24 @@ router.post("/signin", (req, res) => {
     }
   });
 });
+
+router.post('/profile', (req, res) => {
+  Applicant.updateOne({ token: req.body.token }, {name: req.body.name}).then(data => { 
+    console.log(data)
+    // Applicant.find({token: req.body.token}) 
+    //   .then(data => {
+    //     console.log(data)
+    //     if (data.name === req.body.name){
+    //       res.json({ result: true });
+    // } else {
+    //   res.json({ result: false, error: 'User not found' });
+    // }
+    //   })  }
+      res.json({result: data.acknowledged})
+  }
+)}
+);
+ 
+
 
 module.exports = router;
