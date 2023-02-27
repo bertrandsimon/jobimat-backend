@@ -18,10 +18,10 @@ router.post("/", (req, res) => {
         title: req.body.title,
         date: new Date(),
         reference: req.body.reference,
-        description: req.body.description,
-        contract: req.body.contract,
-        store:req.body.store,
-        job_type: req.body.job_type,
+        // description: req.body.description,
+        // contract: req.body.contract,
+        // store:req.body.store,
+        // job_type: req.body.job_type,
         is_top_offer: false,
         is_validated: false,
         candidate_found: false,
@@ -38,6 +38,7 @@ router.post("/", (req, res) => {
   });
 });
 
+// router get search all
 router.get("/", (req, res) => {
   Job.find().then((data) => {
     if (data) {
@@ -49,20 +50,34 @@ router.get("/", (req, res) => {
   });
 });
 
-router.put("/:reference", (req, res) => {
-    Job.findOne({
-      reference: req.body.reference,
+// router get search  by Id
+router.get("/:id", (req, res) => {
+    Job.find({
+      _id: req.params.id,
     }).then((data) => {
-      if (data) { console.log(data);
-        Job.updateOne(
-
-        )
-        res.json({ result: true, reference: data.reference });
+      if (data) {
+        console.log(data);
+        res.json({ result: true, job: data });
       } else {
-        res.json({ result: false, error: "job not found" });
+        res.json({ result: false, error: "job advertisement not found" });
       }
     });
   });
+
+// router.put("/:reference", (req, res) => {
+//     Job.findOne({
+//       reference: req.body.reference,
+//     }).then((data) => {
+//       if (data) { console.log(data);
+//         Job.updateOne(
+
+//         )
+//         res.json({ result: true, reference: data.reference });
+//       } else {
+//         res.json({ result: false, error: "job not found" });
+//       }
+//     });
+//   });
 
 router.delete("/:delete", (req, res) => {
   Job.deleteOne({
