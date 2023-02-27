@@ -1,3 +1,4 @@
+require ("dotenv").config();
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -7,8 +8,13 @@ require('./models/connection')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-var app = express();
 
+
+var app = express();
+const cors = require ("cors");
+app.use(cors());
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
