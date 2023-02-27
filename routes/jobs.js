@@ -52,17 +52,32 @@ router.get("/", (req, res) => {
 
 // router get search  by Id
 router.get("/:id", (req, res) => {
-    Job.find({
-      _id: req.params.id,
-    }).then((data) => {
-      if (data) {
-        console.log(data);
-        res.json({ result: true, job: data });
-      } else {
-        res.json({ result: false, error: "job advertisement not found" });
-      }
-    });
+  Job.findOne({ 
+    _id: req.params.id,
+  }).then((data) => {
+    if (data) {
+      console.log(data);
+      res.json({ result: true, job: data });
+    } else {
+      res.json({ result: false, error: "job advertisement not found" });
+    }
   });
+});
+
+// router get search  by top_offer
+router.get("/top_offer", (req, res) => {
+  Job.find({
+    is_top_offer: true,
+    is_valited:true,
+  }).then((data) => {
+    if (data) {
+      console.log(data);
+      res.json({ result: true, jobs: data });
+    } else {
+      res.json({ result: false, error: "job advertisement not found" });
+    }
+  });
+});
 
 // router.put("/:reference", (req, res) => {
 //     Job.findOne({

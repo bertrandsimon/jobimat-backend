@@ -11,12 +11,6 @@ const jobsRouter = require('./routes/jobs');
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 const adminRouter = require("./routes/admin");
-var app = express(); 
-
-
-
-const cors = require("cors");
-app.use(cors());
 
 var app = express();
 const cors = require ('cors');
