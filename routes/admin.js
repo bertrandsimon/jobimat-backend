@@ -7,6 +7,7 @@ const { checkBody } = require("../modules/checkBody");
 const Applicant = require("../models/applicants");
 const Job = require("../models/jobs");
 require("../models/connection");
+const Template = require("../models/templates");
 
 router.post("/signup", (req, res) => {
   if (!checkBody(req.body, ["email", "password"])) {
@@ -54,4 +55,23 @@ router.get("/jobs", (req, res) => {
   Job.find().populate("store");
 });
 
+router.get('/templates', (req, res) => {
+  Template.find({templateName: req.body.name}).then(data => {
+    console.log(data);
+    res.json({result: true, template: data})
+  })
+ });
+
+// router.get("/templates", (req, res) => {
+//   templates.findOne({
+//     templateName: req.params.templateName,
+//   }).then((data) => {
+//     if (data) {
+//       console.log(data);
+//       res.json({ result: true, templates: data });
+//     } else {
+//       res.json({ result: false, error: "templates advertisement not found" });
+//     }
+//   });
+// });
 module.exports = router;
