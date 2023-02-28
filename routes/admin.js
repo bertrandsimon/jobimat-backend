@@ -51,7 +51,17 @@ router.post("/signin", (req, res) => {
 });
 
 router.get("/jobs", (req, res) => {
-  Job.find().populate("store");
+  Job.find()
+    .populate("contract")
+    .populate("store")
+    .populate("jobType")
+    .then((data) => res.json({ result: true, allJobs: data }));
+});
+
+router.get("/applicants", (req, res) => {
+  Applicant.find().then((data) =>
+    res.json({ result: true, allApplicants: data })
+  );
 });
 
 module.exports = router;
