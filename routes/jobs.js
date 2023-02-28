@@ -41,31 +41,81 @@ router.post("/", (req, res) => {
   });
 });
 
-// router get search all
+// router get search all, by validated or not, by top Offers or not
 router.get("/", (req, res) => {
   Job.find()
     .populate("contract")
     .populate("store")
     .populate("jobType")
     .then((data) => {
-      console.log("data", data);
+      
       const isTopOffer = data.filter(
         (e) => e.isTopOffer === true && e.isValidated === true
       );
       const isNotTop = data.filter(
         (e) => e.isTopOffer === false && e.isValidated === true
       );
+      const isNotValidated = data.filter((e) => e.isValidated === false);
+      const offerValidated = data.filter((e) => e.isValidated === true);
 
       if (data) {
-        res.json({ result: true, allJobs: isNotTop, topOffers: isTopOffer });
+        res.json({
+          result: true,
+          alloffers: data,
+          topOffers: isTopOffer,
+          allJobs: isNotTop,
+          offerValidated: offerValidated,
+          offersNotValidated: isNotValidated,
+        });
       } else {
         res.json({ result: false, error: "job advertisement not found" });
       }
     });
 });
 
-// router get search  by Id
-router.get("/:id", (req, res) => {
+//search by postal code (offer validated only)
+router.get("/:postalCode", (req, res) => {
+  Job.find()
+    .populate("contract")
+    .populate("store")
+    .populate("jobType")
+    .then((data) => {
+      const postal = data.filter(
+        (e) =>
+          e.store.postalCode === req.params.postalCode && e.isValidated === true
+      );
+      if (data) {
+        console.log(data);
+        res.json({ result: true, storeSelected: postal });
+      } else {
+        res.json({ result: false, error: "job advertisement not found" });
+      }
+    });
+});
+
+// search by jobTag (offer validated only)
+router.get("/type/:jobtype", (req, res) => {
+  Job.find()
+    .populate("contract")
+    .populate("store")
+    .populate("jobType")
+    .then((data) => {
+      const jobType = data.filter(
+        (e) =>
+          e.jobType.typeName === req.params.jobtype && e.isValidated === true
+      );
+      if (data) {
+        console.log(data.jobType);
+        res.json({ result: true, Jobtag: jobType });
+      } else {
+        res.json({ result: false, error: "job advertisement not found" });
+      }
+    });
+});
+
+// search offer by Id
+router.get("/id/:id", (req, res) => {
+  console.log(typeof req.params.id);
   Job.findOne({
     _id: req.params.id,
   }).then((data) => {
@@ -105,6 +155,7 @@ router.delete("/:delete", (req, res) => {
     }
   });
 });
+
 router.post("/type", (req, res) => {
   const newJobType = new JobType({
     typeName: req.body.type,
