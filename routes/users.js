@@ -103,4 +103,18 @@ router.post("/profile", (req, res) => {
   });
 });
 
+router.delete("/:delete", (req,res) => {
+  Applicant.deleteOne({
+    token: req.body.token
+  }).then((data) => {
+    if (data.deletedCount > 0) {
+      console.log(data);
+      res.json({ result: true, data: data.reference });
+    } else {
+      res.json({ result: false, error: "applicant not found" });
+    }
+  });
+});
+
+
 module.exports = router;

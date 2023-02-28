@@ -62,16 +62,18 @@ router.get('/templates', (req, res) => {
   })
  });
 
-// router.get("/templates", (req, res) => {
-//   templates.findOne({
-//     templateName: req.params.templateName,
-//   }).then((data) => {
-//     if (data) {
-//       console.log(data);
-//       res.json({ result: true, templates: data });
-//     } else {
-//       res.json({ result: false, error: "templates advertisement not found" });
-//     }
-//   });
-// });
+router.delete("/:delete", (req,res) => {
+  Template.deleteOne({
+    templateName: req.body.name
+  }).then((data) => {
+    if (data.deletedCount > 0) {
+      console.log(data);
+      res.json({ result: true, data: data.reference });
+    } else {
+      res.json({ result: false, error: "applicant not found" });
+    }
+  });
+});
+
+
 module.exports = router;
