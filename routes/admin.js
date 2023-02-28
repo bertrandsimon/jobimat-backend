@@ -52,7 +52,43 @@ router.post("/signin", (req, res) => {
 });
 
 router.get("/jobs", (req, res) => {
-  Job.find().populate("store");
+  Job.find()
+    .populate("contract")
+    .populate("store")
+    .populate("jobType")
+    .then((data) => res.json({ result: true, allJobs: data }));
+});
+
+router.get("/applicants", (req, res) => {
+  Applicant.find()
+    .populate("evaluation")
+    .populate("likedJobs")
+    .populate("appliedJobs")
+    .populate("resume")
+    .then((data) => {
+      console.log(data[0].resume);
+      res.json({ result: true, allApplicants: data[0] });
+    });
+});
+
+//create evaluation
+router.post("/eval", (req, res) => {
+  const newEval = new Evaluation({
+    score: req.body.score,
+    evaluator: req.body.adminId,
+  });
+  newEval
+    .save()
+    .then((data) =>
+      Applicant.updateOne(
+        { _id: req.body.applicantId },
+        { evaluation: data._id }
+      )
+    )
+    .then((data) => {
+      const isGood = data.modifiedCount > 0;
+      res.json({ result: isGood });
+    });
 });
 
 router.get('/templates', (req, res) => {

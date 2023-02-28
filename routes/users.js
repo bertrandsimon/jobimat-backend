@@ -103,4 +103,14 @@ router.post("/profile", (req, res) => {
   });
 });
 
+router.post("/skills", (req, res) => {
+  Applicant.updateOne(
+    { token: req.body.token },
+    { $push: { resume: { skills: req.body.skill } } }
+  ).then((data) => {
+    console.log(data);
+    const isGood = data.modifiedCount > 0;
+    res.json({ result: isGood });
+  });
+});
 module.exports = router;

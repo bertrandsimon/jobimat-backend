@@ -4,6 +4,6 @@ const jobTypeSchema = mongoose.Schema({
   typeName: String,
 });
 
-const JobType = mongoose.model("jobtypes", jobTypeSchema);
+const JobType = mongoose.model("jobTypes", jobTypeSchema);
 
 module.exports = JobType;
