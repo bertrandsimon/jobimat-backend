@@ -12,7 +12,6 @@ var usersRouter = require("./routes/users");
 const adminRouter = require("./routes/admin");
 var app = express();
 
-var app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
 

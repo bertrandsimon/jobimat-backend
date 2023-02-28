@@ -67,9 +67,20 @@ router.get("/top", (req, res) => {
   });
 });
 
+router.get("/top", (req, res) => {
+  Job.find({ is_validated: true, is_top_offer: true }).then((data) => {
+    if (data) {
+      console.log(data);
+      res.json({ result: true, job: data });
+    } else {
+      res.json({ result: false, error: "job advertisement not found" });
+    }
+  });
+});
+
 // router get search  by Id
 router.get("/:id", (req, res) => {
-  Job.find({
+  Job.findOne({
     _id: req.params.id,
   }).then((data) => {
     if (data) {
