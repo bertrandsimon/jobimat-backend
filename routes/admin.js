@@ -4,48 +4,54 @@ const bcrypt = require("bcrypt");
 var express = require("express");
 var router = express.Router();
 const { checkBody } = require("../modules/checkBody");
+const Applicant = require("../models/applicants");
+const Job = require("../models/jobs");
 require("../models/connection");
 
-router.post('/signup', (req, res) => {
-    if (!checkBody(req.body, ['email', 'password'])) {
-      res.json({ result: false, error: 'Missing or empty fields' });
-      return;
-    }
-  
-    // Check if the user has not already been registered
-    Admin.findOne({ email: req.body.email }).then(data => {
-      if (data === null) {
-        const hash = bcrypt.hashSync(req.body.password, 10);
-  
-        const newAdmin = new Admin({
-          email: req.body.email,
-          password: hash,
-          token: uid2(32),
-        });
-  
-        newAdmin.save().then(newDoc => {
-          res.json({ result: true, token: newDoc.token });
-        });
-      } else {
-        // User already exists in database
-        res.json({ result: false, error: 'User already exists' });
-      }
-    });
-  });
+router.post("/signup", (req, res) => {
+  if (!checkBody(req.body, ["email", "password"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
 
-router.post('/signin', (req, res) => {
-    if (!checkBody(req.body, ['email', 'password'])) {
-      res.json({ result: false, error: 'Missing or empty fields' });
-      return;
-    }
-  
-    Admin.findOne({ email: req.body.email }).then(data => {
-      if (data && bcrypt.compareSync(req.body.password, data.password)) {
-        res.json({ result: true, token: data.token });
-      } else {
-        res.json({ result: false, error: 'User not found or wrong password' });
-      }
-    });
-  });
+  // Check if the user has not already been registered
+  Admin.findOne({ email: req.body.email }).then((data) => {
+    if (data === null) {
+      const hash = bcrypt.hashSync(req.body.password, 10);
 
-  module.exports = router;
+      const newAdmin = new Admin({
+        email: req.body.email,
+        password: hash,
+        token: uid2(32),
+      });
+
+      newAdmin.save().then((newDoc) => {
+        res.json({ result: true, token: newDoc.token });
+      });
+    } else {
+      // User already exists in database
+      res.json({ result: false, error: "User already exists" });
+    }
+  });
+});
+
+router.post("/signin", (req, res) => {
+  if (!checkBody(req.body, ["email", "password"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+
+  Admin.findOne({ email: req.body.email }).then((data) => {
+    if (data && bcrypt.compareSync(req.body.password, data.password)) {
+      res.json({ result: true, token: data.token });
+    } else {
+      res.json({ result: false, error: "User not found or wrong password" });
+    }
+  });
+});
+
+router.get("/jobs", (req, res) => {
+  Job.find().populate("store");
+});
+
+module.exports = router;

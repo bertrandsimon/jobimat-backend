@@ -41,6 +41,23 @@ router.post("/", (req, res) => {
 // router get search all
 router.get("/", (req, res) => {
   Job.find().then((data) => {
+    const isTopOffer = data.filter(
+      (e) => e.is_top_offer === true && e.is_validated === true
+    );
+    const isNotTop = data.filter(
+      (e) => e.is_top_offer === false && e.is_validated === true
+    );
+
+    if (data) {
+      console.log(data);
+      res.json({ result: true, allJobs: isNotTop, topOffers: isTopOffer });
+    } else {
+      res.json({ result: false, error: "job advertisement not found" });
+    }
+  });
+});
+router.get("/top", (req, res) => {
+  Job.find({ is_top_offer: true, is_validated: true }).then((data) => {
     if (data) {
       console.log(data);
       res.json({ result: true, job: data });
@@ -52,17 +69,17 @@ router.get("/", (req, res) => {
 
 // router get search  by Id
 router.get("/:id", (req, res) => {
-    Job.find({
-      _id: req.params.id,
-    }).then((data) => {
-      if (data) {
-        console.log(data);
-        res.json({ result: true, job: data });
-      } else {
-        res.json({ result: false, error: "job advertisement not found" });
-      }
-    });
+  Job.find({
+    _id: req.params.id,
+  }).then((data) => {
+    if (data) {
+      console.log(data);
+      res.json({ result: true, job: data });
+    } else {
+      res.json({ result: false, error: "job advertisement not found" });
+    }
   });
+});
 
 // router.put("/:reference", (req, res) => {
 //     Job.findOne({
