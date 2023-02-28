@@ -90,15 +90,6 @@ router.post("/upload/:token", async (req, res) => {
 router.post('/profile', (req, res) => {
   Applicant.updateOne({ token: req.body.token }, {name: req.body.name}).then(data => { 
     console.log(data)
-    // Applicant.find({token: req.body.token}) 
-    //   .then(data => {
-    //     console.log(data)
-    //     if (data.name === req.body.name){
-    //       res.json({ result: true });
-    // } else {
-    //   res.json({ result: false, error: 'User not found' });
-    // }
-    //   })  }
       res.json({result: data.acknowledged})
   }
 )}

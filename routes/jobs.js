@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const { checkBody } = require("../modules/checkBody");
 const Job = require("../models/jobs");
+const Applicant = require("../models/applicants");
 
 // creat a new job advertisement
 router.post("/", (req, res) => {
@@ -106,5 +107,18 @@ router.delete("/:delete", (req, res) => {
     }
   });
 });
+
+router.post
+("/liked", (req, res) => {
+  console.log(req.body);
+  Applicant.updateOne(
+    { token: req.body.token },
+    { $push: { likedJobs: req.body.idJob } }
+  ).then((data) => {
+const isGood = data.modifiedCount > 0;
+console.log(data);
+    res.json({ result: isGood }
+      )});
+}); 
 
 module.exports = router;
