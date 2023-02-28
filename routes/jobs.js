@@ -3,6 +3,9 @@ var router = express.Router();
 const { checkBody } = require("../modules/checkBody");
 const Job = require("../models/jobs");
 const Applicant = require("../models/applicants");
+const Contract = require("../models/contracts");
+const JobType = require("../models/jobTypes");
+const Store = require("../models/stores");
 
 // creat a new job advertisement
 router.post("/", (req, res) => {
@@ -41,39 +44,35 @@ router.post("/", (req, res) => {
 
 // router get search all
 router.get("/", (req, res) => {
-  Job.find().then((data) => {
-    if (data) {
-      console.log(data);
-      res.json({ result: true, job: data });
-    } else {
-      res.json({ result: false, error: "job advertisement not found" });
-    }
-  });
+  Job.find()
+    .populate("contract")
+    .populate("store")
+    .populate("jobType")
+    .then((data) => {
+      console.log("data", data);
+      const isTopOffer = data.filter(
+        (e) => e.isTopOffer === true && e.isValidated === true
+      );
+      const isNotTop = data.filter(
+        (e) => e.isTopOffer === false && e.isValidated === true
+      );
+
+      if (data) {
+        res.json({ result: true, allJobs: isNotTop, topOffers: isTopOffer });
+      } else {
+        res.json({ result: false, error: "job advertisement not found" });
+      }
+    });
 });
 
 // router get search  by Id
 router.get("/:id", (req, res) => {
-  Job.findOne({ 
+  Job.findOne({
     _id: req.params.id,
   }).then((data) => {
     if (data) {
       console.log(data);
       res.json({ result: true, job: data });
-    } else {
-      res.json({ result: false, error: "job advertisement not found" });
-    }
-  });
-});
-
-// router get search  by top_offer
-router.get("/top_offer", (req, res) => {
-  Job.find({
-    is_top_offer: true,
-    is_valited:true,
-  }).then((data) => {
-    if (data) {
-      console.log(data);
-      res.json({ result: true, jobs: data });
     } else {
       res.json({ result: false, error: "job advertisement not found" });
     }
@@ -106,6 +105,12 @@ router.delete("/:delete", (req, res) => {
       res.json({ result: false, error: "job not found" });
     }
   });
+});
+router.post("/type", (req, res) => {
+  const newJobType = new JobType({
+    typeName: req.body.type,
+  });
+  newJobType.save();
 });
 
 router.post

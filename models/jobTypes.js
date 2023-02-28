@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const jobTypesSchema = mongoose.Schema ({
-   typeName:String,
-})
+const jobTypeSchema = mongoose.Schema({
+  typeName: String,
+});
 
-const JobTypes = mongoose.model('jobTypes', jobTypesSchema);
+const JobType = mongoose.model("jobtypes", jobTypeSchema);
 
-module.exports= JobTypes
+module.exports = JobType;

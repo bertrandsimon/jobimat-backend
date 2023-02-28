@@ -24,10 +24,8 @@ router.post("/signup", (req, res) => {
   }
 
   // Check if the user has not already been registered
- 
-  Applicant.findOne({ email: 
-    req.body.email
-     }).then((data) => { 
+
+  Applicant.findOne({ email: req.body.email }).then((data) => {
     if (data === null) {
       const hash = bcrypt.hashSync(req.body.password, 10);
 
@@ -68,33 +66,41 @@ router.post("/signin", (req, res) => {
   });
 });
 //http://localhost:3000/users/upload/:token
-//Add a new doc url to an user
+//Save a new doc in backend
 router.post("/upload/:token", async (req, res) => {
-  const docPath = `./tmp/${uniqid()}.pdf`;
+  const docPath = `./doc/${uniqid()}.pdf`;
   const resultMove = await req.files.docFromFront.mv(docPath);
-
   if (!resultMove) {
-    const resultCloudinary = await cloudinary.uploader.upload(photoPath);
-    fs.unlinkSync(docPath);
     Applicant.updateOne(
       { token: req.params.token },
-      { resumeUrl: resultCloudinary.secure_url }
-    ).then((data) =>
-      res.json({ result: true, url: resultCloudinary.secure_url })
-    );
+      { resumeUrl: docPath }
+    ).then((data) => res.json({ result: true, message: "save ok " }));
   } else {
     res.json({ result: false, error: resultCopy });
   }
+
+  // if (!resultMove) {
+  //   const resultCloudinary = await cloudinary.uploader.upload(photoPath);
+  //   fs.unlinkSync(docPath);
+  //   Applicant.updateOne(
+  //     { token: req.params.token },
+  //     { resumeUrl: resultCloudinary.secure_url }
+  //   ).then((data) =>
+  //     res.json({ result: true, url: resultCloudinary.secure_url })
+  //   );
+  // } else {
+  //   res.json({ result: false, error: resultCopy });
+  // }
 });
 
-router.post('/profile', (req, res) => {
-  Applicant.updateOne({ token: req.body.token }, {name: req.body.name}).then(data => { 
-    console.log(data)
-      res.json({result: data.acknowledged})
-  }
-)}
-);
- 
-
+router.post("/profile", (req, res) => {
+  Applicant.updateOne(
+    { token: req.body.token },
+    { name: req.body.name, surname: req.body.surname }
+  ).then((data) => {
+    console.log(data);
+    res.json({ result: data.acknowledged });
+  });
+});
 
 module.exports = router;
