@@ -5,6 +5,7 @@ const Job = require("../models/jobs");
 const Contract = require("../models/contracts");
 const JobType = require("../models/jobTypes");
 const Store = require("../models/stores");
+const Applicant = require("../models/applicants");
 
 // creat a new job advertisement
 router.post("/", (req, res) => {
@@ -56,6 +57,7 @@ router.get("/", (req, res) => {
         (e) => e.isTopOffer === false && e.isValidated === true
       );
 
+      console.log(data.filter((el) => console.log(el.store.postalCode)));
       if (data) {
         res.json({ result: true, allJobs: isNotTop, topOffers: isTopOffer });
       } else {
@@ -110,6 +112,37 @@ router.post("/type", (req, res) => {
     typeName: req.body.type,
   });
   newJobType.save();
+});
+
+router.post("/applied", (req, res) => {
+  Applicant.updateOne(
+    { token: req.body.token },
+    { $push: { appliedJobs: req.body.idJob } }
+  ).then((data) => {
+    const isGood = data.modifiedCount > 0;
+    res.json({ result: isGood });
+  });
+});
+
+router.get("/:postalCode", (req, res) => {
+  console.log(typeof req.params.postalCode);
+  Job.find()
+    .populate("contract")
+    .populate("store")
+    .populate("jobType")
+    .then((data) => {
+      const code = data.filter(
+        (e) =>
+          e.store.postalCode === req.params.postalCode && e.isValidated === true
+      );
+      console.log(code);
+      // if (data) {
+      //   console.log(data);
+      //   res.json({ result: true, offersByPostalCode: data });
+      // } else {
+      //   res.json({ result: false, error: "job advertisement not found" });
+      // }
+    });
 });
 
 module.exports = router;

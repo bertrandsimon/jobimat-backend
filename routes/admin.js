@@ -59,9 +59,35 @@ router.get("/jobs", (req, res) => {
 });
 
 router.get("/applicants", (req, res) => {
-  Applicant.find().then((data) =>
-    res.json({ result: true, allApplicants: data })
-  );
+  Applicant.find()
+    .populate("evaluation")
+    .populate("likedJobs")
+    .populate("appliedJobs")
+    .populate("resume")
+    .then((data) => {
+      console.log(data[0].resume);
+      res.json({ result: true, allApplicants: data[0] });
+    });
+});
+
+//create evaluation
+router.post("/eval", (req, res) => {
+  const newEval = new Evaluation({
+    score: req.body.score,
+    evaluator: req.body.adminId,
+  });
+  newEval
+    .save()
+    .then((data) =>
+      Applicant.updateOne(
+        { _id: req.body.applicantId },
+        { evaluation: data._id }
+      )
+    )
+    .then((data) => {
+      const isGood = data.modifiedCount > 0;
+      res.json({ result: isGood });
+    });
 });
 
 module.exports = router;
