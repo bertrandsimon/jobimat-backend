@@ -2,6 +2,9 @@ var express = require("express");
 var router = express.Router();
 const { checkBody } = require("../modules/checkBody");
 const Job = require("../models/jobs");
+const Contract = require("../models/contracts");
+const JobType = require("../models/jobTypes");
+const Store = require("../models/stores");
 
 // creat a new job advertisement
 router.post("/", (req, res) => {
@@ -40,42 +43,25 @@ router.post("/", (req, res) => {
 
 // router get search all
 router.get("/", (req, res) => {
-  Job.find().then((data) => {
-    const isTopOffer = data.filter(
-      (e) => e.is_top_offer === true && e.is_validated === true
-    );
-    const isNotTop = data.filter(
-      (e) => e.is_top_offer === false && e.is_validated === true
-    );
+  Job.find()
+    .populate("contract")
+    .populate("store")
+    .populate("jobType")
+    .then((data) => {
+      console.log("data", data);
+      const isTopOffer = data.filter(
+        (e) => e.isTopOffer === true && e.isValidated === true
+      );
+      const isNotTop = data.filter(
+        (e) => e.isTopOffer === false && e.isValidated === true
+      );
 
-    if (data) {
-      console.log(data);
-      res.json({ result: true, allJobs: isNotTop, topOffers: isTopOffer });
-    } else {
-      res.json({ result: false, error: "job advertisement not found" });
-    }
-  });
-});
-router.get("/top", (req, res) => {
-  Job.find({ is_top_offer: true, is_validated: true }).then((data) => {
-    if (data) {
-      console.log(data);
-      res.json({ result: true, job: data });
-    } else {
-      res.json({ result: false, error: "job advertisement not found" });
-    }
-  });
-});
-
-router.get("/top", (req, res) => {
-  Job.find({ is_validated: true, is_top_offer: true }).then((data) => {
-    if (data) {
-      console.log(data);
-      res.json({ result: true, job: data });
-    } else {
-      res.json({ result: false, error: "job advertisement not found" });
-    }
-  });
+      if (data) {
+        res.json({ result: true, allJobs: isNotTop, topOffers: isTopOffer });
+      } else {
+        res.json({ result: false, error: "job advertisement not found" });
+      }
+    });
 });
 
 // router get search  by Id
@@ -118,6 +104,12 @@ router.delete("/:delete", (req, res) => {
       res.json({ result: false, error: "job not found" });
     }
   });
+});
+router.post("/type", (req, res) => {
+  const newJobType = new JobType({
+    typeName: req.body.type,
+  });
+  newJobType.save();
 });
 
 module.exports = router;
