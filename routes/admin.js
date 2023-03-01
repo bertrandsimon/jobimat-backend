@@ -8,6 +8,7 @@ const Applicant = require("../models/applicants");
 const Job = require("../models/jobs");
 require("../models/connection");
 const Template = require("../models/templates");
+const Evaluation = require("../models/evaluations");
 
 router.post("/signup", (req, res) => {
   if (!checkBody(req.body, ["email", "password"])) {
@@ -110,6 +111,20 @@ router.delete("/:delete", (req,res) => {
     }
   });
 });
+
+router.delete("/evaluation/:delete", (req,res) => {
+  Evaluation.deleteOne({
+    evaluator: req.params.delete,
+  }).then((data) => {
+    console.log(data);
+    if (data.deletedCount > 0) {
+      res.json({ result: true, data: data.reference });
+    } else {
+      res.json({ result: false, error: "eval not found" });
+    }
+});
+}); 
+
 
 
 module.exports = router;

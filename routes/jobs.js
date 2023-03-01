@@ -6,7 +6,7 @@ const Applicant = require("../models/applicants");
 const Contract = require("../models/contracts");
 const JobType = require("../models/jobTypes");
 const Store = require("../models/stores");
-const Applicant = require("../models/applicants");
+
 
 // creat a new job advertisement
 router.post("/", (req, res) => {
