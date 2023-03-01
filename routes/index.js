@@ -31,7 +31,7 @@ router.get("/edito/:store", (req, res) => {
     })
   );
 });
-
+//http://localhost:3000/skill
 //create skill
 router.post("/skill", (req, res) => {
   const newSkill = new Skill({
@@ -39,14 +39,22 @@ router.post("/skill", (req, res) => {
   });
   newSkill.save().then((data) => res.json({ result: true }));
 });
-
-//create template
+//http://localhost:3000/template
+//create new template
 router.post("/template", (req, res) => {
   const newTemplate = new Template({
     templateName: req.body.name,
     globalDesc: req.body.desc,
   });
   newTemplate.save();
+});
+
+//create store for test
+router.post("/store", (req, res) => {
+  const newStore = new Store({
+    city: "Nice",
+  });
+  newStore.save().then(() => res.json({ result: true }));
 });
 
 module.exports = router;
