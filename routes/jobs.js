@@ -6,8 +6,7 @@ const Applicant = require("../models/applicants");
 const Contract = require("../models/contracts");
 const JobType = require("../models/jobTypes");
 const Store = require("../models/stores");
-const Applicant = require("../models/applicants");
-
+//http://localhost:3000/jobs/
 // creat a new job advertisement
 router.post("/", (req, res) => {
   console.log(req.body);
@@ -23,14 +22,15 @@ router.post("/", (req, res) => {
         title: req.body.title,
         date: new Date(),
         reference: req.body.reference,
-        // description: req.body.description,
-        // contract: req.body.contract,
-        // store:req.body.store,
-        // job_type: req.body.job_type,
-        is_top_offer: false,
-        is_validated: false,
-        candidate_found: false,
-        is_displayed: false,
+        description: req.body.description,
+        contract: req.body.contract,
+        store: req.body.store,
+        jobType: req.body.job_type,
+        isTopOffer: req.body.isTopOffer,
+        isValidated: req.body.isValidated,
+        candidateFound: req.body.candidateFound,
+        isDisplayed: req.body.isDisplayed,
+        jobImage: req.body.jobImage,
       });
       // save the new  job advertisement
       newJob.save().then(() => {
@@ -44,6 +44,8 @@ router.post("/", (req, res) => {
 });
 
 // router get search all, by validated or not, by top Offers or not
+//http://localhost:3000/jobs/
+// router get search all
 router.get("/", (req, res) => {
   Job.find()
     .populate("contract")
@@ -60,7 +62,6 @@ router.get("/", (req, res) => {
       const isNotValidated = data.filter((e) => e.isValidated === false);
       const offerValidated = data.filter((e) => e.isValidated === true);
 
-      console.log(data.filter((el) => console.log(el.store.postalCode)));
       if (data) {
         res.json({
           result: true,
@@ -131,6 +132,8 @@ router.get("/id/:id", (req, res) => {
   });
 });
 
+
+
 // router.put("/:reference", (req, res) => {
 //     Job.findOne({
 //       reference: req.body.reference,
@@ -146,6 +149,8 @@ router.get("/id/:id", (req, res) => {
 //     });
 //   });
 
+//http://localhost:3000/jobs/
+//delete jobs with id
 router.delete("/:delete", (req, res) => {
   Job.deleteOne({
     _id: req.params.delete,
@@ -158,14 +163,16 @@ router.delete("/:delete", (req, res) => {
     }
   });
 });
-
+//http://localhost:3000/jobs/type
+//create new jobType
 router.post("/type", (req, res) => {
   const newJobType = new JobType({
     typeName: req.body.type,
   });
   newJobType.save();
 });
-
+//http://localhost:3000/jobs/liked
+//add a new liked job to applicant
 router.post("/liked", (req, res) => {
   console.log(req.body);
   Applicant.updateOne(
@@ -177,6 +184,8 @@ router.post("/liked", (req, res) => {
     res.json({ result: isGood });
   });
 });
+//http://localhost:3000/jobs/applied
+//add a new applied job to applicant
 router.post("/applied", (req, res) => {
   Applicant.updateOne(
     { token: req.body.token },
@@ -185,27 +194,6 @@ router.post("/applied", (req, res) => {
     const isGood = data.modifiedCount > 0;
     res.json({ result: isGood });
   });
-});
-
-router.get("/:postalCode", (req, res) => {
-  console.log(typeof req.params.postalCode);
-  Job.find()
-    .populate("contract")
-    .populate("store")
-    .populate("jobType")
-    .then((data) => {
-      const code = data.filter(
-        (e) =>
-          e.store.postalCode === req.params.postalCode && e.isValidated === true
-      );
-      console.log(code);
-      // if (data) {
-      //   console.log(data);
-      //   res.json({ result: true, offersByPostalCode: data });
-      // } else {
-      //   res.json({ result: false, error: "job advertisement not found" });
-      // }
-    });
 });
 
 module.exports = router;

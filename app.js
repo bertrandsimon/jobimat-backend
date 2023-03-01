@@ -10,6 +10,8 @@ const jobsRouter = require("./routes/jobs");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 const adminRouter = require("./routes/admin");
+const statsRouter = require("./routes/stats");
+
 var app = express();
 
 const cors = require("cors");
@@ -25,6 +27,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/jobs", jobsRouter);
+app.use("/stats", statsRouter);
 
 app.use("/admin", adminRouter);
 module.exports = app;
