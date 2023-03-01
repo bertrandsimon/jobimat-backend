@@ -80,27 +80,6 @@ router.get("/id/:id", (req, res) => {
   });
 });
 
-//http://localhost:3000/jobs/:postalCode
-//search by postalCode
-router.get("/:postalCode", (req, res) => {
-  Job.find()
-    .populate("contract")
-    .populate("store")
-    .populate("jobType")
-    .then((data) => {
-      const postal = data.filter(
-        (e) =>
-          e.store.postalCode === req.params.postalCode && e.isValidated === true
-      );
-      if (data) {
-        console.log(data);
-        res.json({ result: true, storeSelected: postal });
-      } else {
-        res.json({ result: false, error: "job advertisement not found" });
-      }
-    });
-});
-
 // router.put("/:reference", (req, res) => {
 //     Job.findOne({
 //       reference: req.body.reference,
@@ -160,6 +139,14 @@ router.post("/applied", (req, res) => {
   ).then((data) => {
     const isGood = data.modifiedCount > 0;
     res.json({ result: isGood });
+  });
+});
+
+//http://localhost:3000/jobs/allTypes
+//get all types
+router.get("/allTypes", (req, res) => {
+  JobType.find().then((data) => {
+    res.json({ result: true, all: data });
   });
 });
 
