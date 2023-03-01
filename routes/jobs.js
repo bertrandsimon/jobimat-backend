@@ -7,6 +7,8 @@ const Contract = require("../models/contracts");
 const JobType = require("../models/jobTypes");
 const Store = require("../models/stores");
 //http://localhost:3000/jobs/
+
+
 // creat a new job advertisement
 router.post("/", (req, res) => {
   console.log(req.body);
