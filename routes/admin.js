@@ -6,9 +6,13 @@ var router = express.Router();
 const { checkBody } = require("../modules/checkBody");
 const Applicant = require("../models/applicants");
 const Job = require("../models/jobs");
-require("../models/connection");
+const Evaluation = require("../models/evaluations");
 const Template = require("../models/templates");
+const Store = require("../models/stores");
+const JobType = require("../models/jobTypes");
 
+//http://localhost:3000/admin/signup
+//create new admin
 router.post("/signup", (req, res) => {
   if (!checkBody(req.body, ["email", "password"])) {
     res.json({ result: false, error: "Missing or empty fields" });
@@ -35,8 +39,10 @@ router.post("/signup", (req, res) => {
     }
   });
 });
-
+//http://localhost:3000/admin/signin
+//login for admin
 router.post("/signin", (req, res) => {
+  //Check if body is empty
   if (!checkBody(req.body, ["email", "password"])) {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
@@ -51,6 +57,8 @@ router.post("/signin", (req, res) => {
   });
 });
 
+//http://localhost:3000/admin/jobs
+//get all jobs
 router.get("/jobs", (req, res) => {
   Job.find()
     .populate("contract")
@@ -59,18 +67,36 @@ router.get("/jobs", (req, res) => {
     .then((data) => res.json({ result: true, allJobs: data }));
 });
 
+//http://localhost:3000/admin/applicants
+//get all applicants
 router.get("/applicants", (req, res) => {
   Applicant.find()
-    .populate("evaluation")
-    .populate("likedJobs")
-    .populate("appliedJobs")
-    .populate("resume")
+    .populate({
+      path: "likedJobs",
+      populate: { path: "store", model: Store },
+    })
+    .populate({
+      path: "likedJobs",
+      populate: { path: "jobType", model: JobType },
+    })
+    .populate({
+      path: "appliedJobs",
+      populate: { path: "store", model: Store },
+    })
+    .populate({
+      path: "appliedJobs",
+      populate: { path: "jobType", model: JobType },
+    })
+    .populate({
+      path: "evaluation",
+      populate: { path: "evaluator", model: Admin },
+    })
     .then((data) => {
-      console.log(data[0].resume);
-      res.json({ result: true, allApplicants: data[0] });
+      res.json({ result: true, allApplicants: data });
     });
 });
 
+//http://localhost:3000/admin/eval
 //create evaluation
 router.post("/eval", (req, res) => {
   const newEval = new Evaluation({
@@ -90,17 +116,19 @@ router.post("/eval", (req, res) => {
       res.json({ result: isGood });
     });
 });
+//http://localhost:3000/admin/templates
+//get template with templateName
 
-router.get('/templates', (req, res) => {
-  Template.find({templateName: req.body.name}).then(data => {
+router.get("/templates", (req, res) => {
+  Template.find({ templateName: req.body.name }).then((data) => {
     console.log(data);
-    res.json({result: true, template: data})
-  })
- });
+    res.json({ result: true, template: data });
+  });
+});
 
-router.delete("/:delete", (req,res) => {
+router.delete("/:delete", (req, res) => {
   Template.deleteOne({
-    templateName: req.body.name
+    templateName: req.body.name,
   }).then((data) => {
     if (data.deletedCount > 0) {
       console.log(data);
@@ -111,5 +139,17 @@ router.delete("/:delete", (req,res) => {
   });
 });
 
+// router.get("/templates", (req, res) => {
+//   templates.findOne({
+//     templateName: req.params.templateName,
+//   }).then((data) => {
+//     if (data) {
+//       console.log(data);
+//       res.json({ result: true, templates: data });
+//     } else {
+//       res.json({ result: false, error: "templates advertisement not found" });
+//     }
+//   });
+// });
 
 module.exports = router;

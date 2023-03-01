@@ -78,21 +78,9 @@ router.post("/upload/:token", async (req, res) => {
   } else {
     res.json({ result: false, error: resultCopy });
   }
-
-  // if (!resultMove) {
-  //   const resultCloudinary = await cloudinary.uploader.upload(photoPath);
-  //   fs.unlinkSync(docPath);
-  //   Applicant.updateOne(
-  //     { token: req.params.token },
-  //     { resumeUrl: resultCloudinary.secure_url }
-  //   ).then((data) =>
-  //     res.json({ result: true, url: resultCloudinary.secure_url })
-  //   );
-  // } else {
-  //   res.json({ result: false, error: resultCopy });
-  // }
 });
-
+//http://localhost:3000/users/profile
+//add name & surname in applicant's profile
 router.post("/profile", (req, res) => {
   Applicant.updateOne(
     { token: req.body.token },
@@ -102,11 +90,12 @@ router.post("/profile", (req, res) => {
     res.json({ result: data.acknowledged });
   });
 });
-
+//http://localhost:3000/users/skills
+//add skills in applicant's profile
 router.post("/skills", (req, res) => {
   Applicant.updateOne(
     { token: req.body.token },
-    { $push: { resume: { skills: req.body.skill } } }
+    { resume: { $push: { skills: req.body.skill } } }
   ).then((data) => {
     console.log(data);
     const isGood = data.modifiedCount > 0;

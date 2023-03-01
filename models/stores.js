@@ -4,7 +4,7 @@ const storeSchema = mongoose.Schema({
   city: String,
   address: String,
   postalCode: String,
-  phonContact: String,
+  phoneContact: String,
   photoUrl: String,
   desc: String,
   email: String,
