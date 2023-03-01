@@ -49,6 +49,29 @@ router.get("/", async (req, res) => {
       return total;
     });
   const percentOfAppliedJob = (appliedJobs / numbOfJobs) * 100;
+  const types = await JobType.find().then((data) => data);
+  const jobs = await Job.find()
+    .populate("contract")
+    .populate("store")
+    .populate("jobType")
+    .then((data) => data);
+
+  const sortedJobsByType = {};
+  types.forEach((type) => {
+    sortedJobsByType[type.typeName] = jobs.filter(
+      (job) => job.jobType.typeName === type.typeName
+    ).length;
+  });
+  const allStores = await Store.find().then((data) => data);
+
+  const sortedJobsByStore = {};
+  allStores.forEach((eachStore) => {
+    sortedJobsByStore[eachStore.storeName] = jobs.filter(
+      // (job) => job.store.storeName === eachStore.storeName
+      //attention compare id avec equals
+      (job) => job.store._id.equals(eachStore._id)
+    ).length;
+  });
 
   res.json({
     result: true,
@@ -63,6 +86,8 @@ router.get("/", async (req, res) => {
     appliedJobs,
     likedJobs,
     percentOfAppliedJob,
+    sortedJobsByType,
+    sortedJobsByStore,
   });
 });
 

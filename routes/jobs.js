@@ -212,13 +212,23 @@ router.get("/byTypes", async (req, res) => {
     .populate("jobType")
     .then((data) => data);
 
-  const sortedJobs = {};
+  const sortedJobs = [];
   types.forEach((type) => {
-    sortedJobs[type.typeName] = jobs.filter(
-      (job) => job.jobType.typeName === type.typeName
-    );
+    sortedJobs.push({
+      key: type.typeName,
+      nb: jobs.filter((job) => job.jobType.typeName === type.typeName).length,
+      data: jobs.filter((job) => job.jobType.typeName === type.typeName),
+    });
   });
   res.json({ result: true, jobsByType: sortedJobs });
 });
 
+router.post("/update/:key", (req, res) => {
+  Job.findOne({ _id: req.body.id }).then((data) => {
+    const newValue = data[req.params.key];
+    Job.updateOne({ _id: data._id }, { [req.params.key]: !newValue }).then(
+      (data) => res.json({ result: data.modifiedCount > 0 })
+    );
+  });
+});
 module.exports = router;

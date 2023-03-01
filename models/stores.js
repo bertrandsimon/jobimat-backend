@@ -13,6 +13,7 @@ const storeSchema = mongoose.Schema({
   editorialTitle: String,
   editorialText: String,
   editorialPhoto: String,
+  storeName: String,
 });
 
 const Store = mongoose.model("stores", storeSchema);
