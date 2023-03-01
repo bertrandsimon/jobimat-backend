@@ -199,4 +199,24 @@ router.get("/allTypes", (req, res) => {
   });
 });
 
+//http://localhost:3000/jobs/byTypes
+//sort jobs by types
+
+router.get("/byTypes", async (req, res) => {
+  const types = await JobType.find().then((data) => data);
+  const jobs = await Job.find()
+    .populate("contract")
+    .populate("store")
+    .populate("jobType")
+    .then((data) => data);
+
+  const sortedJobs = {};
+  types.forEach((type) => {
+    sortedJobs[type.typeName] = jobs.filter(
+      (job) => job.jobType.typeName === type.typeName
+    );
+  });
+  res.json({ result: true, jobsByType: sortedJobs });
+});
+
 module.exports = router;
