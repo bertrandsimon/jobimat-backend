@@ -10,7 +10,7 @@ const Template = require("../models/templates");
 //http://localhost:3000/edito
 //router.get edito for home page
 router.get("/edito", (req, res) => {
-  Store.findOne({ storeName: "gedex" }).then((data) =>
+  Store.findOne({ storeName: "Gedex" }).then((data) =>
     res.json({
       result: true,
       title: data.editorialTitle,
@@ -55,6 +55,30 @@ router.post("/store", (req, res) => {
     city: "Nice",
   });
   newStore.save().then(() => res.json({ result: true }));
+});
+
+//add edito
+
+router.post("/storeEdito", async (req, res) => {
+  const stores = await Store.find().then((data) => data);
+  stores.forEach((store) => {
+    const title = `Bienvenue dans le magasin de ${store.storeName.substring(
+      store.storeName.indexOf("-") + 2
+    )}`;
+    const text =
+      "Venez découvrir nos dernières nouveautés dans votre magasin préféré.";
+    const img =
+      "https://www.gedimatlabenne.fr/wp-content/uploads/2022/03/gedimat-qui-sommes-nous.jpg";
+    Store.updateOne(
+      { storeName: store.storeName },
+      {
+        editorialTitle: title,
+        editorialText: text,
+        editorialPhoto: img,
+      }
+    ).then((data) => console.log(data));
+  });
+  res.json({ result: true });
 });
 
 module.exports = router;

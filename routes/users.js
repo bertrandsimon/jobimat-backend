@@ -18,7 +18,7 @@ cloudinary.config({
 //Create a new user
 router.post("/signup", (req, res) => {
   console.log(req.body);
-  if (!checkBody(req.body, ["email", "password"])) {
+  if (!checkBody(req.body, ["email", "password", "name", "surname"])) {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
@@ -59,7 +59,12 @@ router.post("/signin", (req, res) => {
       return res.json({ result: false, error: "user doesn't exist" });
     }
     if (bcrypt.compareSync(password, data.password)) {
-      return res.json({ result: true, token: data.token });
+      return res.json({
+        result: true,
+        token: data.token,
+        name: data.name,
+        surname: data.surname,
+      });
     } else {
       return res.json({ result: false, error: "wrong password" });
     }
@@ -102,9 +107,9 @@ router.post("/skills", (req, res) => {
     res.json({ result: isGood });
   });
 });
-router.delete("/:delete", (req,res) => {
+router.delete("/:delete", (req, res) => {
   Applicant.deleteOne({
-    token: req.body.token
+    token: req.body.token,
   }).then((data) => {
     if (data.deletedCount > 0) {
       console.log(data);
@@ -114,6 +119,5 @@ router.delete("/:delete", (req,res) => {
     }
   });
 });
-
 
 module.exports = router;
