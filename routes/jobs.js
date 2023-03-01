@@ -77,7 +77,7 @@ router.get("/", (req, res) => {
 });
 
 //search by postal code (offer validated only)
-router.get("/:postalCode", (req, res) => {
+router.get("/code/:postalCode", (req, res) => {
   Job.find()
     .populate("contract")
     .populate("store")
@@ -103,13 +103,11 @@ router.get("/type/:jobtype", (req, res) => {
     .populate("store")
     .populate("jobType")
     .then((data) => {
-      const jobType = data.filter(
-        (e) =>
-          e.jobType.typeName === req.params.jobtype && e.isValidated === true
+      let typeOfJob = data.filter(
+        (e) => e.jobType.typeName === req.params.jobtype
       );
       if (data) {
-        console.log(data.jobType);
-        res.json({ result: true, Jobtag: jobType });
+        res.json({ result: true, Jobtag: typeOfJob });
       } else {
         res.json({ result: false, error: "job advertisement not found" });
       }
