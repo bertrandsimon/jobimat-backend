@@ -8,7 +8,6 @@ const JobType = require("../models/jobTypes");
 const Store = require("../models/stores");
 //http://localhost:3000/jobs/
 
-
 // creat a new job advertisement
 router.post("/", (req, res) => {
   console.log(req.body);
@@ -66,10 +65,10 @@ router.get("/", (req, res) => {
       if (data) {
         res.json({
           result: true,
-          alloffers: data,
+          allOffers: data,
           topOffers: isTopOffer,
           allJobs: isNotTop,
-          offerValidated: offerValidated,
+          offersValidated: offerValidated,
           offersNotValidated: isNotValidated,
         });
       } else {
@@ -230,5 +229,17 @@ router.post("/update/:key", (req, res) => {
       (data) => res.json({ result: data.modifiedCount > 0 })
     );
   });
+});
+
+router.get("/inputData", async (req, res) => {
+  let jobName = await Job.find().then((data) => data.map((el) => el.title));
+  jobName = jobName.filter((el, i) => jobName.indexOf(el) === i);
+  let storeData = await Store.find().then((data) =>
+    data.map((el) => {
+      return { postalCode: el.postalCode, storeName: el.storeName };
+    })
+  );
+
+  res.json({ result: true, postes: jobName, stores: storeData });
 });
 module.exports = router;

@@ -32,6 +32,8 @@ router.post("/signup", (req, res) => {
       const newApplicant = new Applicant({
         email: req.body.email,
         password: hash,
+        name: req.body.name,
+        surname: req.body.surname,
         token: uid2(32),
       });
 
@@ -86,15 +88,15 @@ router.post("/upload/:token", async (req, res) => {
 });
 //http://localhost:3000/users/profile
 //add name & surname in applicant's profile
-router.post("/profile", (req, res) => {
-  Applicant.updateOne(
-    { token: req.body.token },
-    { name: req.body.name, surname: req.body.surname }
-  ).then((data) => {
-    console.log(data);
-    res.json({ result: data.acknowledged });
-  });
-});
+// router.post("/profile", (req, res) => {
+//   Applicant.updateOne(
+//     { token: req.body.token },
+//     { name: req.body.name, surname: req.body.surname }
+//   ).then((data) => {
+//     console.log(data);
+//     res.json({ result: data.acknowledged });
+//   });
+// });
 //http://localhost:3000/users/skills
 //add skills in applicant's profile
 router.post("/skills", (req, res) => {
