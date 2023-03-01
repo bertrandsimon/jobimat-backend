@@ -52,7 +52,6 @@ router.get("/", (req, res) => {
     .populate("store")
     .populate("jobType")
     .then((data) => {
-      
       const isTopOffer = data.filter(
         (e) => e.isTopOffer === true && e.isValidated === true
       );
@@ -132,8 +131,6 @@ router.get("/id/:id", (req, res) => {
   });
 });
 
-
-
 // router.put("/:reference", (req, res) => {
 //     Job.findOne({
 //       reference: req.body.reference,
@@ -193,6 +190,14 @@ router.post("/applied", (req, res) => {
   ).then((data) => {
     const isGood = data.modifiedCount > 0;
     res.json({ result: isGood });
+  });
+});
+
+//http://localhost:3000/jobs/allTypes
+//get all types
+router.get("/allTypes", (req, res) => {
+  JobType.find().then((data) => {
+    res.json({ result: true, all: data });
   });
 });
 
