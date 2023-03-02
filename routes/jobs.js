@@ -52,7 +52,6 @@ router.get("/", (req, res) => {
     .populate("store")
     .populate("jobType")
     .then((data) => {
-      
       const isTopOffer = data.filter(
         (e) => e.isTopOffer === true && e.isValidated === true
       );
@@ -134,20 +133,10 @@ router.get("/id/:id", (req, res) => {
 
 
 
-// router.put("/:reference", (req, res) => {
-//     Job.findOne({
-//       reference: req.body.reference,
-//     }).then((data) => {
-//       if (data) { console.log(data);
-//         Job.updateOne(
 
-//         )
-//         res.json({ result: true, reference: data.reference });
-//       } else {
-//         res.json({ result: false, error: "job not found" });
-//       }
-//     });
-//   });
+
+
+
 
 //http://localhost:3000/jobs/
 //delete jobs with id
