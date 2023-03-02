@@ -236,7 +236,8 @@ router.get("/inputData", async (req, res) => {
   jobName = jobName.filter((el, i) => jobName.indexOf(el) === i);
   let storeData = await Store.find().then((data) =>
     data.map((el) => {
-      return { postalCode: el.postalCode, storeName: el.storeName };
+      return `${el.postalCode} ${el.storeName}`;
+      // return  postalCode: el.postalCode, storeName: el.storeName ;
     })
   );
 

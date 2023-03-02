@@ -6,14 +6,8 @@ const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 const Applicant = require("../models/applicants");
 const uniqid = require("uniqid");
-const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-});
 //http://localhost:3000/users/signup
 //Create a new user
 router.post("/signup", (req, res) => {
@@ -36,7 +30,7 @@ router.post("/signup", (req, res) => {
         surname: req.body.surname,
         token: uid2(32),
       });
-
+      //save new doc in db
       newApplicant.save().then((newDoc) => {
         res.json({ result: true, token: newDoc.token });
       });
@@ -54,7 +48,7 @@ router.post("/signin", (req, res) => {
   if (!email || !password) {
     return res.json({ result: false, error: "something is missing" });
   }
-
+  //search if someone already use this email
   Applicant.findOne({ email }).then((data) => {
     console.log(data);
     if (!data) {
@@ -109,6 +103,8 @@ router.post("/skills", (req, res) => {
     res.json({ result: isGood });
   });
 });
+//http://localhost:3000/:delete
+//delete a doc in db
 router.delete("/:delete", (req, res) => {
   Applicant.deleteOne({
     token: req.body.token,
@@ -121,5 +117,8 @@ router.delete("/:delete", (req, res) => {
     }
   });
 });
+
+//http://localhost:3000/password
+//user can
 
 module.exports = router;
