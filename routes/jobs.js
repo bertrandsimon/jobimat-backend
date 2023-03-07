@@ -132,16 +132,9 @@ router.get("/id/:id", (req, res) => {
   });
 });
 
-
-
-
-
-
-
-
-//http://localhost:3000/jobs/
+//http://localhost:3000/jobs/delete/:delete
 //delete jobs with id
-router.delete("/:delete", (req, res) => {
+router.delete("/delete/:delete", (req, res) => {
   Job.deleteOne({
     _id: req.params.delete,
   }).then((data) => {
@@ -241,7 +234,6 @@ router.get("/inputData", async (req, res) => {
   res.json({ result: true, postes: jobName, stores: storeData });
 });
 
-
 //http://localhost:3000/jobs/deleteLiked
 //delete one job liked
 router.delete("/deleteLiked", (req, res) => {
@@ -253,9 +245,9 @@ router.delete("/deleteLiked", (req, res) => {
     res.json({ result: data.modifiedCount > 0 });
   });
 });
-//http://localhost:3000/jobs/deleteApplied
+//localhost:3000/jobs/deleteApplied
 //delete one job applied
-router.delete("/deleteApplied", (req, res) => {
+http: router.delete("/deleteApplied", (req, res) => {
   Applicant.updateOne(
     { token: req.body.token },
     { $pull: { likedJobs: req.body.idJob } }
