@@ -6,8 +6,8 @@ const Applicant = require("../models/applicants");
 const Contract = require("../models/contracts");
 const JobType = require("../models/jobTypes");
 const Store = require("../models/stores");
-//http://localhost:3000/jobs/
 
+//http://localhost:3000/jobs/
 // creat a new job advertisement
 router.post("/", (req, res) => {
   console.log(req.body);
@@ -77,6 +77,7 @@ router.get("/", (req, res) => {
     });
 });
 
+//http://localhost:3000/jobs/code/:postalCode
 //search by postal code (offer validated only)
 router.get("/code/:postalCode", (req, res) => {
   Job.find()
@@ -97,6 +98,7 @@ router.get("/code/:postalCode", (req, res) => {
     });
 });
 
+//http://localhost:3000/jobs/type/:jobtype
 // search by jobTag (offer validated only)
 router.get("/type/:jobtype", (req, res) => {
   Job.find()
@@ -114,7 +116,7 @@ router.get("/type/:jobtype", (req, res) => {
       }
     });
 });
-
+//http://localhost:3000/jobs/id/:id
 // search offer by Id
 router.get("/id/:id", (req, res) => {
   console.log(typeof req.params.id);
@@ -162,7 +164,6 @@ router.post("/type", (req, res) => {
 //http://localhost:3000/jobs/liked
 //add a new liked job to applicant
 router.post("/liked", (req, res) => {
-  console.log(req.body);
   Applicant.updateOne(
     { token: req.body.token },
     { $push: { likedJobs: req.body.idJob } }
@@ -214,6 +215,8 @@ router.get("/byTypes", async (req, res) => {
   res.json({ result: true, jobsByType: sortedJobs });
 });
 
+//http://localhost:3000/jobs/update/:key
+//Change value for one key in one job
 router.post("/update/:key", (req, res) => {
   Job.findOne({ _id: req.body.id }).then((data) => {
     const newValue = data[req.params.key];
@@ -223,12 +226,15 @@ router.post("/update/:key", (req, res) => {
   });
 });
 
+//http://localhost:3000/jobs/inputData
+//all data for input autocomplete
 router.get("/inputData", async (req, res) => {
   let jobName = await Job.find().then((data) => data.map((el) => el.title));
   jobName = jobName.filter((el, i) => jobName.indexOf(el) === i);
   let storeData = await Store.find().then((data) =>
     data.map((el) => {
-      return { postalCode: el.postalCode, storeName: el.storeName };
+      return `${el.postalCode} ${el.storeName}`;
+      // return  postalCode: el.postalCode, storeName: el.storeName ;
     })
   );
 
@@ -236,5 +242,28 @@ router.get("/inputData", async (req, res) => {
 });
 
 
+//http://localhost:3000/jobs/deleteLiked
+//delete one job liked
+router.delete("/deleteLiked", (req, res) => {
+  Applicant.findOne({ token }).then((data) => {
+    const newLikedJobs = data.likedJobs.filter((job) => job !== req.body.id);
+    Applicant.updateOne({ token }, { $set: { likedJobs: newLikedJobs } }).then(
+      (data) => res.json({ result: data.modifiedCount > 0 })
+    );
+  });
+});
+//http://localhost:3000/jobs/deleteApplied
+//delete one job applied
+router.delete("/deleteApplied", (req, res) => {
+  Applicant.findOne({ token }).then((data) => {
+    const newAppliedJobs = data.appliedJobs.filter(
+      (job) => job !== req.body.id
+    );
+    Applicant.updateOne(
+      { token },
+      { $set: { likedJobs: newAppliedJobs } }
+    ).then((data) => res.json({ result: data.modifiedCount > 0 }));
+  });
+});
 
 module.exports = router;

@@ -1,19 +1,16 @@
 var express = require("express");
 var router = express.Router();
 require("../models/connection");
-const { checkBody } = require("../modules/checkBody");
+const { checkBody } = require("../modules/checkbody");
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 const Applicant = require("../models/applicants");
 const uniqid = require("uniqid");
-const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
+const Store = require("../models/stores");
+const Job = require("../models/jobs");
+const JobType = require("../models/jobTypes");
 
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-});
 //http://localhost:3000/users/signup
 //Create a new user
 router.post("/signup", (req, res) => {
@@ -36,7 +33,7 @@ router.post("/signup", (req, res) => {
         surname: req.body.surname,
         token: uid2(32),
       });
-
+      //save new doc in db
       newApplicant.save().then((newDoc) => {
         res.json({ result: true, token: newDoc.token });
       });
@@ -54,9 +51,8 @@ router.post("/signin", (req, res) => {
   if (!email || !password) {
     return res.json({ result: false, error: "something is missing" });
   }
-
+  //search if someone already use this email
   Applicant.findOne({ email }).then((data) => {
-    console.log(data);
     if (!data) {
       return res.json({ result: false, error: "user doesn't exist" });
     }
@@ -109,6 +105,8 @@ router.post("/skills", (req, res) => {
     res.json({ result: isGood });
   });
 });
+//http://localhost:3000/:delete
+//delete a doc in db
 router.delete("/:delete", (req, res) => {
   Applicant.deleteOne({
     token: req.body.token,
@@ -119,6 +117,67 @@ router.delete("/:delete", (req, res) => {
     } else {
       res.json({ result: false, error: "applicant not found" });
     }
+  });
+});
+
+//http://localhost:3000/users/pass
+//user can change password
+
+router.post("/pass", (req, res) => {
+  const { token, password, newPassword } = req.body;
+  console.log(req.body);
+  Applicant.findOne({ token }).then((data) => {
+    if (bcrypt.compareSync(password, data.password)) {
+      const newHash = bcrypt.hashSync(newPassword, 10);
+      Applicant.updateOne(
+        { token: req.body.token },
+        { password: newHash }
+      ).then((data) => {
+        console.log(data);
+        res.json({ result: data.modifiedCount > 0 });
+      });
+    } else {
+      res.json({ result: false });
+    }
+  });
+});
+
+//http://localhost:3000/users/profile
+//see user profile
+
+router.get("/profile/:token", (req, res) => {
+  let profile = {};
+  Applicant.findOne({ token: req.params.token })
+    .populate({
+      path: "likedJobs",
+      populate: { path: "store", model: Store },
+    })
+    .populate({
+      path: "likedJobs",
+      populate: { path: "jobType", model: JobType },
+    })
+    .populate({
+      path: "appliedJobs",
+      populate: { path: "store", model: Store },
+    })
+    .populate({
+      path: "appliedJobs",
+      populate: { path: "jobType", model: JobType },
+    })
+    .then((data) => {
+      profile = data;
+      res.json({ result: true, allData: profile });
+    });
+});
+
+//http://localhost:3000/users/deleteCV
+//delete CV in db & backend
+router.delete("/deleteCV", (req, res) => {
+  Applicant.findOne({ token }).then((data) => {
+    fs.unlinkSync(data.resumeUrl);
+    Applicant.updateOne({ token }, { resumeUrl: "" }).then((data) =>
+      res.json({ result: data.modifiedCount > 0 })
+    );
   });
 });
 

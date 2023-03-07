@@ -8,7 +8,8 @@ const Store = require("../models/stores");
 const Admin = require("../models/admins");
 const Evaluation = require("../models/evaluations");
 const Template = require("../models/templates");
-
+//http://localhost:3000/stats
+//all stats, but to fat for Edouard's PC
 router.get("/", async (req, res) => {
   const numbOfApplicants = await Applicant.find().then((data) => data.length);
   const numbOfJobs = await Job.find().then((data) => data.length);
@@ -71,6 +72,11 @@ router.get("/", async (req, res) => {
       //attention compare id avec equals
       (job) => job.store._id.equals(eachStore._id)
     ).length;
+    allStores.forEach((eachStore) => {
+      sortedJobsByStore[eachStore.adherent] = jobs.filter(
+        (job) => job.store.adherent === eachStore.adherent
+      ).length;
+    });
   });
 
   res.json({
@@ -88,6 +94,90 @@ router.get("/", async (req, res) => {
     percentOfAppliedJob,
     sortedJobsByType,
     sortedJobsByStore,
+  });
+});
+// nb de total offre / semaine, /mois, /années
+//mm pourvus
+//offre créées
+
+//http://localhost:3000/stats/job/stats
+//stats per years
+router.get("/job/stat", async (req, res) => {
+  //all offers
+  const all = await Job.find().then((data) => {
+    return data;
+  });
+  const arrYears = { all: {}, top: {}, applied: {} };
+  all.forEach((obj) => {
+    const key = new Date(obj.date).getFullYear();
+    arrYears.all[key] = all.filter((el) => {
+      const newDate = new Date(el.date).getFullYear();
+      return el.candidateFound === false && newDate === key;
+    }).length;
+    arrYears.top[key] = all.filter((el) => {
+      const newDate = new Date(el.date).getFullYear();
+      return (
+        newDate === key && el.isTopOffer === true && el.candidateFound === false
+      );
+    }).length;
+    arrYears.applied[key] = all.filter((el) => {
+      const newDate = new Date(el.date).getFullYear();
+      return newDate === key && el.candidateFound === true;
+    }).length;
+  });
+  const arrMonths = { all: {}, top: {}, applied: {} };
+  all.forEach((obj) => {
+    const key = `${new Date(obj.date).getMonth() + 1}-${new Date(
+      obj.date
+    ).getFullYear()}`;
+    arrMonths.all[key] = all.filter((el) => {
+      const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
+        el.date
+      ).getFullYear()}`;
+      return (
+        (el.candidateFound === false && newDate === key) ||
+        (new Date(obj.date).getMonth() - 1 > new Date(el.date).getMonth() - 1 &&
+          new Date(obj.date).getFullYear() > new Date(el.date).getFullYear())
+      );
+    }).length;
+    arrMonths.top[key] = all.filter((el) => {
+      const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
+        el.date
+      ).getFullYear()}`;
+      return newDate === key && el.isTopOffer === true;
+    }).length;
+    arrMonths.applied[key] = all.filter((el) => {
+      const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
+        el.date
+      ).getFullYear()}`;
+      return newDate === key && el.candidateFound === true;
+    }).length;
+  });
+  // const arrWeeks = { all: {}, top: {}, applied: {} };
+  // all.forEach((obj) => {
+  //   const date = new Date(obj.date);
+  //   const year = new Date(date.getFullYear(), 0, 1);
+  //   const days = Math.floor((date - year) / (24 * 60 * 60 * 1000));
+  //   const week = Math.ceil((date.getDay() + 1 + days) / 7) - 1;
+  //   const key = `S${week}-${new Date(obj.date).getFullYear()}`;
+  //   arrWeeks.all[key] = all.filter((el) => {
+  //     const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
+  //     return newDate === key || ;
+  //   }).length;
+  //   arrWeeks.top[key] = all.filter((el) => {
+  //     const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
+  //     return newDate === key && el.isTopOffer === true;
+  //   }).length;
+  //   arrWeeks.applied[key] = all.filter((el) => {
+  //     const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
+  //     return newDate === key && el.candidateFound === true;
+  //   }).length;
+  // });
+  res.json({
+    result: true,
+    allOffersByYear: arrYears,
+    allOffersByMonth: arrMonths,
+    // allOffersByWeek: arrWeeks,
   });
 });
 

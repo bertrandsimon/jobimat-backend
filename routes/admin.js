@@ -11,7 +11,6 @@ const Template = require("../models/templates");
 const Store = require("../models/stores");
 const JobType = require("../models/jobTypes");
 
-
 //http://localhost:3000/admin/signup
 //create new admin
 router.post("/signup", (req, res) => {
@@ -126,7 +125,8 @@ router.get("/templates", (req, res) => {
     res.json({ result: true, template: data });
   });
 });
-
+//http://localhost:3000/admin/:delete
+//delete one template
 router.delete("/:delete", (req, res) => {
   Template.deleteOne({
     templateName: req.body.name,
@@ -152,9 +152,12 @@ router.delete("/:delete", (req, res) => {
 //     }
 //   });
 // });
-router.delete("/evaluation/:delete", (req,res) => {
+
+//http://localhost:3000/admin/evaluations/:delete
+//delete one evaluation
+router.delete("/evaluation/:delete", (req, res) => {
   Evaluation.deleteOne({
-    evaluator: req.params.delete,
+    _id: req.params.delete,
   }).then((data) => {
     console.log(data);
     if (data.deletedCount > 0) {
@@ -162,9 +165,7 @@ router.delete("/evaluation/:delete", (req,res) => {
     } else {
       res.json({ result: false, error: "eval not found" });
     }
+  });
 });
-}); 
-
-
 
 module.exports = router;
