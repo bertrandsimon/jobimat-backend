@@ -234,4 +234,7 @@ router.get("/inputData", async (req, res) => {
 
   res.json({ result: true, postes: jobName, stores: storeData });
 });
+
+
+
 module.exports = router;

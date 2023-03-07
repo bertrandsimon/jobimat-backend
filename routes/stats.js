@@ -91,4 +91,147 @@ router.get("/", async (req, res) => {
   });
 });
 
+router.get("/job/stat", async (req, res) => {
+  //all offers
+  const all = await Job.find().then((data) => {
+    return data;
+  });
+  const arrYears = { all: {}, top: {}, applied: {} };
+  all.forEach((obj) => {
+    const key = new Date(obj.date).getFullYear();
+    arrYears.all[key] = all.filter((el) => {
+      const newDate = new Date(el.date).getFullYear();
+      return newDate === key;
+    }).length;
+    arrYears.top[key] = all.filter((el) => {
+      const newDate = new Date(el.date).getFullYear();
+      return (
+        newDate === key && el.isTopOffer === true && el.candidateFound === false
+      );
+    }).length;
+    arrYears.applied[key] = all.filter((el) => {
+      const newDate = new Date(el.date).getFullYear();
+      return newDate === key && el.candidateFound === true;
+    }).length;
+  });
+  const arrMonths = { all: {}, top: {}, applied: {} };
+  all.forEach((obj) => {
+    const key = `${new Date(obj.date).getMonth() + 1}-${new Date(
+      obj.date
+    ).getFullYear()}`;
+    arrMonths.all[key] = all.filter((el) => {
+      const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
+        el.date
+      ).getFullYear()}`;
+      return (
+        (el.candidateFound === false && newDate === key) ||
+        (new Date(obj.date).getMonth() - 1 > new Date(el.date).getMonth() - 1 &&
+          new Date(obj.date).getFullYear() > new Date(el.date).getFullYear())
+      );
+    }).length;
+    arrMonths.top[key] = all.filter((el) => {
+      const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
+        el.date
+      ).getFullYear()}`;
+      return newDate === key && el.isTopOffer === true;
+    }).length;
+    arrMonths.applied[key] = all.filter((el) => {
+      const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
+        el.date
+      ).getFullYear()}`;
+      return newDate === key && el.candidateFound === true;
+    }).length;
+  });
+  // const arrWeeks = { all: {}, top: {}, applied: {} };
+  // all.forEach((obj) => {
+  //   const date = new Date(obj.date);
+  //   const year = new Date(date.getFullYear(), 0, 1);
+  //   const days = Math.floor((date - year) / (24 * 60 * 60 * 1000));
+  //   const week = Math.ceil((date.getDay() + 1 + days) / 7) - 1;
+  //   const key = `S${week}-${new Date(obj.date).getFullYear()}`;
+  //   arrWeeks.all[key] = all.filter((el) => {
+  //     const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
+  //     return newDate === key || ;
+  //   }).length;
+  //   arrWeeks.top[key] = all.filter((el) => {
+  //     const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
+  //     return newDate === key && el.isTopOffer === true;
+  //   }).length;
+  //   arrWeeks.applied[key] = all.filter((el) => {
+  //     const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
+  //     return newDate === key && el.candidateFound === true;
+  //   }).length;
+  // });
+  res.json({
+    result: true,
+    allOffersByYear: arrYears,
+    allOffersByMonth: arrMonths,
+    // allOffersByWeek: arrWeeks,
+  });
+});
+
+//router test for charts
+// router.get("/test", async (req, res) => {
+//   const all = await Job.find().then((data) => data);
+//   let byYear = {};
+//   all.forEach((element) => {
+//     const date = new Date(element.date).getFullYear();
+
+//     return (byYear[date] = all.filter(
+//       (job) => new Date(job.date).getFullYear() === date
+//     ).length);
+//   });
+//   res.json({ result: true, test: byYear });
+// });
+
+
+//  for Chart's job by type
+router.get("/jobsByType", async (req, res) => {
+  const types = await JobType.find().then((data) => data);
+  const jobs = await Job.find()
+    .populate("jobType")
+    .then((data) => data);
+
+  const sortedJobsByType = {};
+  types.forEach((type) => {
+    sortedJobsByType[type.typeName] = jobs.filter(
+      (job) => job.jobType.typeName === type.typeName
+    ).length;
+  });
+  res.json({ result: true, jobsByType: sortedJobsByType });
+});
+
+
+//  for Chart's job by branch
+router.get("/jobsByBranch", async (req, res) => {
+  const job = await Job.find()
+    .populate("store")
+    .then((data) => data);
+
+  const allStores = await Store.find().then((data) => data);
+
+  const sortedJobsByBranch = {};
+  allStores.forEach((eachStore) => {
+    sortedJobsByBranch[eachStore.adherent] = job.filter(
+      (key) => key.store.adherent === eachStore.adherent
+    ).length;
+  });
+  
+  const formattedSortedJobsByBranch = {};
+  Object.keys(sortedJobsByBranch)
+    .sort((a, b) => sortedJobsByBranch[a] - sortedJobsByBranch[b])
+    .forEach((key) => {
+      formattedSortedJobsByBranch[key] = sortedJobsByBranch[key];
+    });
+  
+const sortedValues = Object.values(formattedSortedJobsByBranch).sort((a, b) => b - a);
+const sortedBranch = {};
+
+sortedValues.forEach((value) => {
+  const key = Object.keys(formattedSortedJobsByBranch).find((key) => formattedSortedJobsByBranch[key] === value);
+  sortedBranch[key] = value;
+});
+res.json({ result: true, adherent: sortedBranch });
+});
+
 module.exports = router;
