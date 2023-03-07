@@ -245,25 +245,21 @@ router.get("/inputData", async (req, res) => {
 //http://localhost:3000/jobs/deleteLiked
 //delete one job liked
 router.delete("/deleteLiked", (req, res) => {
-  Applicant.findOne({ token }).then((data) => {
-    const newLikedJobs = data.likedJobs.filter((job) => job !== req.body.id);
-    Applicant.updateOne({ token }, { $set: { likedJobs: newLikedJobs } }).then(
-      (data) => res.json({ result: data.modifiedCount > 0 })
-    );
+  Applicant.updateOne(
+    { token: req.body.token },
+    { $pull: { likedJobs: req.body.idJob } }
+  ).then((data) => {
+    console.log(data);
+    res.json({ result: data.modifiedCount > 0 });
   });
 });
 //http://localhost:3000/jobs/deleteApplied
 //delete one job applied
 router.delete("/deleteApplied", (req, res) => {
-  Applicant.findOne({ token }).then((data) => {
-    const newAppliedJobs = data.appliedJobs.filter(
-      (job) => job !== req.body.id
-    );
-    Applicant.updateOne(
-      { token },
-      { $set: { likedJobs: newAppliedJobs } }
-    ).then((data) => res.json({ result: data.modifiedCount > 0 }));
-  });
+  Applicant.updateOne(
+    { token: req.body.token },
+    { $pull: { likedJobs: req.body.idJob } }
+  ).then((data) => res.json({ result: data.modifiedCount > 0 }));
 });
 
 module.exports = router;

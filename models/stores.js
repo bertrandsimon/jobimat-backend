@@ -14,7 +14,7 @@ const storeSchema = mongoose.Schema({
   editorialText: String,
   editorialPhoto: String,
   storeName: String,
-  adherent:String,
+  adherent: String,
 });
 
 const Store = mongoose.model("stores", storeSchema);

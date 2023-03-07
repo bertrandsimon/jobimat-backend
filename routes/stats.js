@@ -104,9 +104,7 @@ router.get("/", async (req, res) => {
 //stats per years
 router.get("/job/stat", async (req, res) => {
   //all offers
-  const all = await Job.find().then((data) => {
-    return data;
-  });
+  const all = await Job.find();
   const arrYears = { all: {}, top: {}, applied: {} };
   all.forEach((obj) => {
     const key = new Date(obj.date).getFullYear();
@@ -153,32 +151,47 @@ router.get("/job/stat", async (req, res) => {
       return newDate === key && el.candidateFound === true;
     }).length;
   });
-  // const arrWeeks = { all: {}, top: {}, applied: {} };
-  // all.forEach((obj) => {
-  //   const date = new Date(obj.date);
-  //   const year = new Date(date.getFullYear(), 0, 1);
-  //   const days = Math.floor((date - year) / (24 * 60 * 60 * 1000));
-  //   const week = Math.ceil((date.getDay() + 1 + days) / 7) - 1;
-  //   const key = `S${week}-${new Date(obj.date).getFullYear()}`;
-  //   arrWeeks.all[key] = all.filter((el) => {
-  //     const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
-  //     return newDate === key || ;
-  //   }).length;
-  //   arrWeeks.top[key] = all.filter((el) => {
-  //     const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
-  //     return newDate === key && el.isTopOffer === true;
-  //   }).length;
-  //   arrWeeks.applied[key] = all.filter((el) => {
-  //     const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
-  //     return newDate === key && el.candidateFound === true;
-  //   }).length;
-  // });
+  const arrWeeks = { all: {}, top: {}, applied: {} };
+  all.forEach((obj) => {
+    const date = new Date(obj.date);
+    const year = new Date(date.getFullYear(), 0, 1);
+    const days = Math.floor((date - year) / (24 * 60 * 60 * 1000));
+    const week = Math.ceil((date.getDay() + 1 + days) / 7) - 1;
+    const key = `S${week}-${new Date(obj.date).getFullYear()}`;
+    arrWeeks.all[key] = all.filter((el) => {
+      const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
+      return newDate === key;
+    }).length;
+    arrWeeks.top[key] = all.filter((el) => {
+      const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
+      return newDate === key && el.isTopOffer === true;
+    }).length;
+    arrWeeks.applied[key] = all.filter((el) => {
+      const newDate = `S${week}-${new Date(el.date).getFullYear()}`;
+      return newDate === key && el.candidateFound === true;
+    }).length;
+  });
   res.json({
     result: true,
     allOffersByYear: arrYears,
     allOffersByMonth: arrMonths,
     // allOffersByWeek: arrWeeks,
   });
+});
+router.get("/byStore", async (req, res) => {
+  const allStores = await Store.find().then((data) => data);
+  const jobs = await Job.find()
+    .populate("store")
+    .then((data) => data);
+
+  const sortedJobsByStore = {};
+  jobs.forEach((store) => {
+    console.log(store.store.adherent);
+    sortedJobsByStore[store.store.adherent] = jobs.filter(
+      (job) => job.store.adherent === store.store.adherent
+    ).length;
+  });
+  res.json({ result: true, data: sortedJobsByStore });
 });
 
 router.get("/job/stat", async (req, res) => {
