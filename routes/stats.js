@@ -344,7 +344,7 @@ router.get("/jobsByBranch", async (req, res) => {
 
 router.get("/perYears", async (req, res) => {
   const jobs = await Job.find();
-  const topJobs = await Job.find({ isTopOffer: true });
+  const topJobs = await Job.find({ isTopOffer: true, candidateFound: false });
   const filledJobs = await Job.find({ candidateFound: true });
   const sortedJobs = { all: {}, top: {}, filled: {} };
   jobs.forEach((element) => {
