@@ -217,34 +217,34 @@ router.get("/job/stat", async (req, res) => {
       return newDate === key && el.candidateFound === true;
     }).length;
   });
-  const arrMonths = { all: {}, top: {}, applied: {} };
-  all.forEach((obj) => {
-    const key = `${new Date(obj.date).getMonth() + 1}-${new Date(
-      obj.date
-    ).getFullYear()}`;
-    arrMonths.all[key] = all.filter((el) => {
-      const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
-        el.date
-      ).getFullYear()}`;
-      return (
-        (el.candidateFound === false && newDate === key) ||
-        (new Date(obj.date).getMonth() - 1 > new Date(el.date).getMonth() - 1 &&
-          new Date(obj.date).getFullYear() > new Date(el.date).getFullYear())
-      );
-    }).length;
-    arrMonths.top[key] = all.filter((el) => {
-      const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
-        el.date
-      ).getFullYear()}`;
-      return newDate === key && el.isTopOffer === true;
-    }).length;
-    arrMonths.applied[key] = all.filter((el) => {
-      const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
-        el.date
-      ).getFullYear()}`;
-      return newDate === key && el.candidateFound === true;
-    }).length;
-  });
+  // const arrMonths = { all: {}, top: {}, applied: {} };
+  // all.forEach((obj) => {
+  //   const key = `${new Date(obj.date).getMonth() + 1}-${new Date(
+  //     obj.date
+  //   ).getFullYear()}`;
+  //   arrMonths.all[key] = all.filter((el) => {
+  //     const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
+  //       el.date
+  //     ).getFullYear()}`;
+  //     return (
+  //       (el.candidateFound === false && newDate === key) ||
+  //       (new Date(obj.date).getMonth() - 1 > new Date(el.date).getMonth() - 1 &&
+  //         new Date(obj.date).getFullYear() > new Date(el.date).getFullYear())
+  //     );
+  //   }).length;
+  //   arrMonths.top[key] = all.filter((el) => {
+  //     const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
+  //       el.date
+  //     ).getFullYear()}`;
+  //     return newDate === key && el.isTopOffer === true;
+  //   }).length;
+  //   arrMonths.applied[key] = all.filter((el) => {
+  //     const newDate = `${new Date(el.date).getMonth() + 1}-${new Date(
+  //       el.date
+  //     ).getFullYear()}`;
+  //     return newDate === key && el.candidateFound === true;
+  //   }).length;
+  // });
   // const arrWeeks = { all: {}, top: {}, applied: {} };
   // all.forEach((obj) => {
   //   const date = new Date(obj.date);
@@ -268,7 +268,7 @@ router.get("/job/stat", async (req, res) => {
   res.json({
     result: true,
     allOffersByYear: arrYears,
-    allOffersByMonth: arrMonths,
+    // allOffersByMonth: arrMonths,
     // allOffersByWeek: arrWeeks,
   });
 });
@@ -341,25 +341,143 @@ router.get("/jobsByBranch", async (req, res) => {
 
 // test to reduce router
 //http://localhost:3000/stats/perYears
-//just all  565.079 ms
-// all + top 984.025 ms
-//
+
 router.get("/perYears", async (req, res) => {
   const jobs = await Job.find();
+  const topJobs = await Job.find({ isTopOffer: true });
+  const filledJobs = await Job.find({ candidateFound: true });
   const sortedJobs = { all: {}, top: {}, filled: {} };
   jobs.forEach((element) => {
     const key = new Date(element.date).getFullYear();
     sortedJobs.all[key] = jobs.filter((job) => {
       return new Date(job.date).getFullYear() === key;
     }).length;
-    // sortedJobs.top[key] = jobs.filter((job) => {
-    //   return (
-    //     job.isTopOffer === true && new Date(job.date).getFullYear() === key
-    //   ).length;
-    // });
+    sortedJobs.top[key] = topJobs.filter((job) => {
+      return new Date(job.date).getFullYear() === key;
+    }).length;
+    sortedJobs.filled[key] = filledJobs.filter((job) => {
+      return new Date(job.date).getFullYear() === key;
+    }).length;
   });
 
   res.json({ result: true, sortedJobs });
 });
+router.get("/choiseYears/:start/:end", async (req, res) => {
+  const start = Number(req.params.start);
+  const end = Number(req.params.end);
+  const jobs = await Job.find();
+  const topJobs = await Job.find({ isTopOffer: true });
+  const filledJobs = await Job.find({ candidateFound: true });
+  const sortedJobs = { all: {}, top: {}, filled: {} };
+  jobs.forEach((element) => {
+    const key = new Date(element.date).getFullYear();
+    if (key >= start && key <= end) {
+      sortedJobs.all[key] = jobs.filter((job) => {
+        return new Date(job.date).getFullYear() === key;
+      }).length;
+      sortedJobs.top[key] = topJobs.filter((job) => {
+        return new Date(job.date).getFullYear() === key;
+      }).length;
+      sortedJobs.filled[key] = filledJobs.filter((job) => {
+        return new Date(job.date).getFullYear() === key;
+      }).length;
+    }
+  });
+
+  res.json({ result: true, sortedJobs });
+});
+
+router.get("/perMonths", async (req, res) => {
+  const jobs = await Job.find();
+  const topJobs = await Job.find({ isTopOffer: true });
+  const filledJobs = await Job.find({ candidateFound: true });
+  const sortedJobs = { all: {}, top: {}, filled: {} };
+  console.log("test");
+  jobs.forEach((element) => {
+    const months = new Date(element.date).getMonth() + 1;
+    const years = new Date(element.date).getFullYear();
+    if (!sortedJobs.all[years]) {
+      sortedJobs.all[years] = {};
+    }
+    if (!sortedJobs.top[years]) {
+      sortedJobs.top[years] = {};
+    }
+    if (!sortedJobs.filled[years]) {
+      sortedJobs.filled[years] = {};
+    }
+    sortedJobs.all[years][months] = jobs.filter((job) => {
+      return (
+        new Date(job.date).getFullYear() === years &&
+        new Date(job.date).getMonth() + 1 === months
+      );
+    }).length;
+    sortedJobs.top[years][months] = topJobs.filter((job) => {
+      return (
+        new Date(job.date).getFullYear() === years &&
+        new Date(job.date).getMonth() + 1 === months
+      );
+    }).length;
+    sortedJobs.filled[years][months] = filledJobs.filter((job) => {
+      return (
+        new Date(job.date).getFullYear() === years &&
+        new Date(job.date).getMonth() + 1 === months
+      );
+    }).length;
+  });
+  res.json({ result: true, sortedJobs });
+});
+router.get(
+  "/choiseMonths/:yearStart/:yearEnd/:monthStart/:monthEnd",
+  async (req, res) => {
+    const yearStart = Number(req.params.yearStart);
+    const yearEnd = Number(req.params.yearEnd);
+    const monthStart = Number(req.params.monthStart);
+    const monthEnd = Number(req.params.monthEnd);
+    const jobs = await Job.find();
+    const topJobs = await Job.find({ isTopOffer: true });
+    const filledJobs = await Job.find({ candidateFound: true });
+    const sortedJobs = { all: {}, top: {}, filled: {} };
+    jobs.forEach((element) => {
+      const months = new Date(element.date).getMonth() + 1;
+      const years = new Date(element.date).getFullYear();
+      if (
+        years >= yearStart &&
+        years <= yearEnd &&
+        months >= monthStart &&
+        months <= monthEnd
+      ) {
+        if (!sortedJobs.all[years]) {
+          sortedJobs.all[years] = {};
+        }
+        if (!sortedJobs.top[years]) {
+          sortedJobs.top[years] = {};
+        }
+        if (!sortedJobs.filled[years]) {
+          sortedJobs.filled[years] = {};
+        }
+        sortedJobs.all[years][months] = jobs.filter((job) => {
+          return (
+            new Date(job.date).getFullYear() === years &&
+            new Date(job.date).getMonth() + 1 === months
+          );
+        }).length;
+        sortedJobs.top[years][months] = topJobs.filter((job) => {
+          return (
+            new Date(job.date).getFullYear() === years &&
+            new Date(job.date).getMonth() + 1 === months
+          );
+        }).length;
+        sortedJobs.filled[years][months] = filledJobs.filter((job) => {
+          return (
+            new Date(job.date).getFullYear() === years &&
+            new Date(job.date).getMonth() + 1 === months
+          );
+        }).length;
+      }
+    });
+
+    res.json({ result: true, sortedJobs });
+  }
+);
 
 module.exports = router;

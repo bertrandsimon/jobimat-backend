@@ -10,37 +10,29 @@ const Store = require("../models/stores");
 //http://localhost:3000/jobs/
 // creat a new job advertisement
 router.post("/", (req, res) => {
-  console.log(req.body);
   if (!checkBody(req.body, ["title"])) {
     res.json({ result: false, error: "Missing or empty field" });
     return;
   }
-  // check if advertisement job is already registred
-  Job.findOne({ reference: req.body.reference }).then((data) => {
-    if (data === null) {
-      // job not yet registred => creat new job advertisement
-      const newJob = new Job({
-        title: req.body.title,
-        date: new Date(),
-        reference: req.body.reference,
-        description: req.body.description,
-        contract: req.body.contract,
-        store: req.body.store,
-        jobType: req.body.job_type,
-        isTopOffer: req.body.isTopOffer,
-        isValidated: req.body.isValidated,
-        candidateFound: req.body.candidateFound,
-        isDisplayed: req.body.isDisplayed,
-        jobImage: req.body.jobImage,
-      });
-      // save the new  job advertisement
-      newJob.save().then(() => {
-        res.json({ result: true, newjob: newJob });
-      });
-    } else {
-      // job advertisement is already registered
-      res.json({ result: false, error: "job advertisement  already exists" });
-    }
+
+  // job not yet registred => creat new job advertisement
+  const newJob = new Job({
+    title: req.body.title,
+    date: new Date(),
+    reference: req.body.reference,
+    description: req.body.description,
+    contract: req.body.contract,
+    store: req.body.store,
+    jobType: req.body.job_type,
+    isTopOffer: req.body.isTopOffer,
+    isValidated: req.body.isValidated,
+    candidateFound: req.body.candidateFound,
+    isDisplayed: req.body.isDisplayed,
+    jobImage: req.body.jobImage,
+  });
+  // save the new  job advertisement
+  newJob.save().then(() => {
+    res.json({ result: true, newjob: newJob });
   });
 });
 
