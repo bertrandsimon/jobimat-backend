@@ -162,4 +162,16 @@ router.get("/image", (req, res) => {
   ).then((data) => res.json({ result: data.modifiedCount > 0 }));
 });
 
+//add skills for each applicant
+router.post("/addSkill", (req, res) => {
+  Applicant.updateMany(
+    {},
+    { resume: { $push: { skills: "63fe07afae8b43188fe3eded" } } }
+  ).then((data) => {
+    console.log(data);
+    const isGood = data.modifiedCount > 0;
+    res.json({ result: isGood });
+  });
+});
+
 module.exports = router;

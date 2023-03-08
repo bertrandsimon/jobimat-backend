@@ -287,7 +287,6 @@ router.get("/job/stat", async (req, res) => {
 //   res.json({ result: true, test: byYear });
 // });
 
-
 //  for Chart's job by type
 router.get("/jobsByType", async (req, res) => {
   const types = await JobType.find().then((data) => data);
@@ -304,7 +303,6 @@ router.get("/jobsByType", async (req, res) => {
   res.json({ result: true, jobsByType: sortedJobsByType });
 });
 
-
 //  for Chart's job by branch
 router.get("/jobsByBranch", async (req, res) => {
   const job = await Job.find()
@@ -319,22 +317,49 @@ router.get("/jobsByBranch", async (req, res) => {
       (key) => key.store.adherent === eachStore.adherent
     ).length;
   });
-  
+
   const formattedSortedJobsByBranch = {};
   Object.keys(sortedJobsByBranch)
     .sort((a, b) => sortedJobsByBranch[a] - sortedJobsByBranch[b])
     .forEach((key) => {
       formattedSortedJobsByBranch[key] = sortedJobsByBranch[key];
     });
-  
-const sortedValues = Object.values(formattedSortedJobsByBranch).sort((a, b) => b - a);
-const sortedBranch = {};
 
-sortedValues.forEach((value) => {
-  const key = Object.keys(formattedSortedJobsByBranch).find((key) => formattedSortedJobsByBranch[key] === value);
-  sortedBranch[key] = value;
+  const sortedValues = Object.values(formattedSortedJobsByBranch).sort(
+    (a, b) => b - a
+  );
+  const sortedBranch = {};
+
+  sortedValues.forEach((value) => {
+    const key = Object.keys(formattedSortedJobsByBranch).find(
+      (key) => formattedSortedJobsByBranch[key] === value
+    );
+    sortedBranch[key] = value;
+  });
+  res.json({ result: true, adherent: sortedBranch });
 });
-res.json({ result: true, adherent: sortedBranch });
+
+// test to reduce router
+//http://localhost:3000/stats/perYears
+//just all  565.079 ms
+// all + top 984.025 ms
+//
+router.get("/perYears", async (req, res) => {
+  const jobs = await Job.find();
+  const sortedJobs = { all: {}, top: {}, filled: {} };
+  jobs.forEach((element) => {
+    const key = new Date(element.date).getFullYear();
+    sortedJobs.all[key] = jobs.filter((job) => {
+      return new Date(job.date).getFullYear() === key;
+    }).length;
+    // sortedJobs.top[key] = jobs.filter((job) => {
+    //   return (
+    //     job.isTopOffer === true && new Date(job.date).getFullYear() === key
+    //   ).length;
+    // });
+  });
+
+  res.json({ result: true, sortedJobs });
 });
 
 module.exports = router;

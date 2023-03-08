@@ -168,4 +168,10 @@ router.delete("/evaluation/:delete", (req, res) => {
   });
 });
 
+//http://localhost:3000/admin/stores
+router.get("/stores", async (req, res) => {
+  const allStores = await Store.find();
+  res.json({ result: true, allStores });
+});
+
 module.exports = router;
