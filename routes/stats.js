@@ -426,6 +426,7 @@ router.get("/perMonths", async (req, res) => {
   });
   res.json({ result: true, sortedJobs });
 });
+
 router.get(
   "/choiseMonths/:yearStart/:yearEnd/:monthStart/:monthEnd",
   async (req, res) => {
@@ -479,5 +480,29 @@ router.get(
     res.json({ result: true, sortedJobs });
   }
 );
+router.get("/nbApplicants", async (req, res) => {
+  const allApplicants = await Applicant.find();
+  res.json({ result: true, nb: allApplicants.length });
+});
+// add top et filled
+router.get("/nbOffers", async (req, res) => {
+  const allOffers = await Job.find();
+  res.json({
+    result: true,
+    nbGlobal: allOffers.length,
+    nbTop: allOffers.filter((el) => el.isTopOffer === true).length,
+    nbFilled: allOffers.filter((el) => el.candidateFound === true).length,
+  });
+});
+
+// router nb adherent
+
+router.get("/nbAdherent", async (req, res) => {
+  const allAdherent = await Store.find();
+  const sortedStores = new Set(allAdherent.map((data) => data.adherent));
+  console.log(sortedStores);
+
+  res.json({ result: true, nb: sortedStores.size });
+});
 
 module.exports = router;

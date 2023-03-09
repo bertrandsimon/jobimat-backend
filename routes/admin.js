@@ -179,7 +179,7 @@ router.get("/stores", async (req, res) => {
 
 router.get("/contracts", async (req, res) => {
   const allContracts = await Contract.find();
-  res.json({ result: true, contracts: data });
+  res.json({ result: true, contracts: allContracts });
 });
 
 router.get("/getJobType", async (req, res) => {
