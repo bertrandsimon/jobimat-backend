@@ -180,6 +180,7 @@ router.delete("/deleteCV", (req, res) => {
     );
   });
 });
+//http://localhost:3000/users/infoUser
 router.post("/infoUser", (req, res) => {
   console.log(req.body);
   Applicant.updateOne(

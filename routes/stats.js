@@ -527,5 +527,41 @@ router.get("/compareShop/:first/:second", async (req, res) => {
     },
   });
 });
+
 // route pour recup ts les mag d'un franchise et retourné part all, top , filled
+router.get("/byAdherent/:adherent", (req, res) => {
+  let sorted = {};
+  Store.find({ adherent: req.params.adherent }).then((stores) => {
+    // console.log(stores);
+    Job.find({ store: { $in: stores } }).then((jobs) => {
+      // console.log(jobs);
+      jobs.forEach((el) => {
+        const storeName = stores
+          .map((data) => {
+            // console.log(el.store);
+            // console.log(el.store.equals(data._id));
+            if (el.store.equals(data._id)) {
+              // console.log("data.storeName", data.storeName);
+              return data.storeName;
+            }
+          })
+          .join("");
+        if (!sorted[storeName]) {
+          console.log(storeName);
+          sorted[storeName] = {};
+          console.log(sorted);
+        }
+        sorted[storeName].all = jobs.length;
+        sorted[storeName].top = jobs.filter(
+          (el) => el.isTopOffer === true
+        ).length;
+        sorted[storeName].filled = jobs.filter(
+          (el) => el.candidateFound === true
+        ).length;
+      });
+      res.json({ result: true, data: sorted });
+    });
+  });
+});
+
 module.exports = router;
