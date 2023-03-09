@@ -10,6 +10,7 @@ const Evaluation = require("../models/evaluations");
 const Template = require("../models/templates");
 const Store = require("../models/stores");
 const JobType = require("../models/jobTypes");
+const Contract = require("../models/contracts");
 
 //http://localhost:3000/admin/signup
 //create new admin
@@ -172,6 +173,22 @@ router.delete("/evaluation/:delete", (req, res) => {
 router.get("/stores", async (req, res) => {
   const allStores = await Store.find();
   res.json({ result: true, allStores });
+});
+
+//http://localhost:3000/jobs/contract
+
+router.get("/contracts", async (req, res) => {
+  const allContracts = await Contract.find();
+  res.json({ result: true, contracts: data });
+});
+
+router.get("/getJobType", async (req, res) => {
+  const allTypes = await JobType.find();
+  res.json({ result: true, types: allTypes });
+});
+router.get("/getAllStores", async (req, res) => {
+  const allStores = await Store.find();
+  res.json({ result: true, stores: allStores });
 });
 
 module.exports = router;
