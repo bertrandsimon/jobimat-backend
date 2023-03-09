@@ -505,4 +505,27 @@ router.get("/nbAdherent", async (req, res) => {
   res.json({ result: true, nb: sortedStores.size });
 });
 
+router.get("/compareShop/:first/:second", async (req, res) => {
+  const first = await Job.find({ store: req.params.first });
+  const second = await Job.find({ store: req.params.second });
+
+  res.json({
+    result: true,
+    firstStore: {
+      all: first.length,
+      top: first.filter((el) => el.isTopOffer === true).length,
+      filled: first.filter(
+        (el) => el.candidateFound === true && el.isTopOffer === false
+      ).length,
+    },
+    secondStore: {
+      all: second.length,
+      top: second.filter((el) => el.isTopOffer === true).length,
+      filled: second.filter(
+        (el) => el.candidateFound === true && el.isTopOffer === false
+      ).length,
+    },
+  });
+});
+
 module.exports = router;
