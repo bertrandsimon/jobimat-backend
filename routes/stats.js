@@ -527,5 +527,5 @@ router.get("/compareShop/:first/:second", async (req, res) => {
     },
   });
 });
-
+// route pour recup ts les mag d'un franchise et retourné part all, top , filled
 module.exports = router;

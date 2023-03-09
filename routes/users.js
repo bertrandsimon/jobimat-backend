@@ -180,5 +180,21 @@ router.delete("/deleteCV", (req, res) => {
     );
   });
 });
-
+router.post("/infoUser", (req, res) => {
+  console.log(req.body);
+  Applicant.updateOne(
+    { token: req.body.token },
+    {
+      resume: {
+        profileDesc: req.body.desc,
+        educations: req.body.educ,
+        experiences: req.body.exp,
+        hobbies: req.body.hobbies,
+        englishLevel: req.body.eng,
+        spanishLevel: req.body.span,
+        germanLevel: req.body.germ,
+      },
+    }
+  ).then((data) => res.json({ result: data.modifiedCount > 0 }));
+});
 module.exports = router;

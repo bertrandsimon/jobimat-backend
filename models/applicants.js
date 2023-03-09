@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const resumeSchema = mongoose.Schema({
   profileDesc: String,
-  educations: Array,
-  experiences: Array,
-  hobbies: Array,
+  educations: String,
+  experiences: String,
+  hobbies: String,
   email: String,
   phone: String,
   address: String,
