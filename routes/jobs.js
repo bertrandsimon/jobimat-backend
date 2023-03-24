@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const { checkBody } = require("../modules/checkBody");
+const { checkBody } = require("../modules/checkbody");
 const Job = require("../models/jobs");
 const Applicant = require("../models/applicants");
 const Contract = require("../models/contracts");
